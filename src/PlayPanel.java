@@ -13,6 +13,8 @@ public class PlayPanel extends JPanel {
 
     public PlayPanel() {
         player = new Player(this);
+        addKeyListener(player);
+        setFocusable(true);
         portal =  new Portal(this);
     }
 
@@ -22,12 +24,13 @@ public class PlayPanel extends JPanel {
 
     public void update() {
         portal.update();
+        player.update();
     }
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
         portal.draw(g2);
-        player.update();
+        player.draw(g2);
     }
 
 }

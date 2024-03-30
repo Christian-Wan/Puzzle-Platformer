@@ -11,7 +11,8 @@ public class Player implements KeyListener{
     private BufferedImage walkR, jumpR, standR, walkL, jumpL, standL;
     private int x, y, frameNumber, framesPassed, speed;
     private PlayPanel playPanel;
-    private boolean up, down, left, right, facingRight, facingLeft;
+    private boolean up, down, left, right, facingRight, facingLeft, jumpAnimation, inAir;
+    private Rectangle collisionBox;
     public Player(PlayPanel p) {
         x = 100;
         y = 100;
@@ -25,11 +26,14 @@ public class Player implements KeyListener{
         right = false;
         facingLeft = false;
         facingRight = true;
+        inAir = false;
+        collisionBox = new Rectangle(x + playPanel.getSCALE(), y, 13 * playPanel.getSCALE(), 22 * playPanel.getSCALE() + 1);
         try {
             walkR = ImageIO.read(new File("image/Mage_WalkR.png"));
-            jumpR = ImageIO.read(new File("image/Mage_JumpR.png"));
-            standR = ImageIO.read(new File("image/Mage_StandR.png"));
             walkL = ImageIO.read(new File("image/Mage_WalkL.png"));
+            jumpR = ImageIO.read(new File("image/Mage_JumpR.png"));
+            jumpL = ImageIO.read(new File("image/Mage_JumpL.png"));
+            standR = ImageIO.read(new File("image/Mage_StandR.png"));
             standL = ImageIO.read(new File("image/Mage_StandL.png"));
         } catch (IOException ignored) {}
     }
@@ -37,17 +41,43 @@ public class Player implements KeyListener{
     public void update() {
         framesPassed++;
 
-        if (right) {
+        if (right && (!wallOnRight(playPanel.getTempPlatform2()) && !wallOnRight(playPanel.getTempPlatform3()))) {
             x += 3;
         }
-        else if (left) {
+        else if (left && (!wallOnLeft(playPanel.getTempPlatform2()) && !wallOnLeft(playPanel.getTempPlatform3()))) {
             x -= 3;
         }
 
+        //if touching platform send player to top of the platform
+        if (touchingPlatform(playPanel.getTempPlatform()) || touchingPlatform(playPanel.getTempPlatform2()) || touchingPlatform(playPanel.getTempPlatform3())) {
+            inAir = false;
+        }
+        else {
+            inAir = true;
+        }
+        if (!up && inAir) {
+            y += 6;
+        }
+        else if (up) {
+            y -= 3;
+        }
 
+        collisionBox.setLocation(x + playPanel.getSCALE(), y);
 
         if (framesPassed == 6) {
-            if (right) {
+            if (jumpAnimation) {
+                if (frameNumber != 10) {
+                    frameNumber++;
+                    if (frameNumber == 6) {
+                        up = false;
+                    }
+                }
+                else {
+                    frameNumber = 0;
+                    jumpAnimation = false;
+                }
+            }
+            else if (right) {
                 if (frameNumber != 7) {
                     frameNumber++;
                 } else {
@@ -61,9 +91,7 @@ public class Player implements KeyListener{
                     frameNumber = 0;
                 }
             }
-            else if (up) {
-                // add forced jump animation
-            }
+
             else {
                 if (frameNumber != 5) {
                     frameNumber++;
@@ -75,26 +103,59 @@ public class Player implements KeyListener{
             framesPassed = 0;
         }
     }
+    //the standing left animation is wrong
     public void draw(Graphics2D g) {
         BufferedImage image = null;
-        if (right) {
-            image = walkR.getSubimage(25 + (64 * frameNumber), 21, 14, 22);
-            System.out.println("WALK");
+        if (jumpAnimation && facingRight) {
+            image = jumpR.getSubimage(1 + (64 * frameNumber), 25, 15, 23);
+        }
+        else if (jumpAnimation && facingLeft) {
+            image = jumpL.getSubimage(1 + (64 * frameNumber), 25, 15, 23);
+        }
+        else if (right) {
+            image = walkR.getSubimage(24 + (64 * frameNumber), 21, 15, 23);
+//            System.out.println("WALK");
         }
         else if (left) {
-            image = walkL.getSubimage(25 + (64 * frameNumber), 21, 14, 22);
-            System.out.println("WALK");
-        }
-        else if (up) {
-            image = null;
+            image = walkL.getSubimage(24 + (64 * frameNumber), 21, 15, 23);
+//            System.out.println("WALK");
         }
         else if (facingRight) {
-            image = standR.getSubimage(25 + (64 * (frameNumber / 3)), 21, 14, 22);
+            image = standR.getSubimage(24 + (64 * (frameNumber / 3)), 21, 15, 23);
         }
         else {
-            image = standL.getSubimage(25 + (64 * (frameNumber / 3)), 21, 14, 22);
+            image = standL.getSubimage(24 + (64 * (frameNumber / 3)), 21, 15, 23);
         }
-        g.drawImage(image, x, y, 22 * playPanel.getSCALE(), 32 * playPanel.getSCALE(), null);
+        g.drawImage(image, x, y, 14 * playPanel.getSCALE(), 23 * playPanel.getSCALE(), null);
+        g.drawRect(collisionBox.x, collisionBox.y, collisionBox.width, collisionBox.height);
+    }
+
+
+    //Don't know if true but the player can most likely walk through walls if the wall is smaller than the player and the wall is at player's chest level
+    public boolean touchingPlatform(Rectangle rect) {
+        if (collisionBox.intersects(rect)) {
+            y = (int) (rect.getY() - collisionBox.getHeight() + 1);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean wallOnLeft(Rectangle rect) {
+        if ((rect.getX() + rect.getWidth() >= collisionBox.getX()) && (rect.getX() <= collisionBox.getX()) && ((rect.getY() + 1 < collisionBox.getY() && rect.getY() + rect.getHeight() - 1 > collisionBox.getY()) || (rect.getY() + 1 < collisionBox.getY() + collisionBox.getHeight() && rect.getY() + rect.getHeight() - 1 > collisionBox.getY()  + collisionBox.getHeight()))) {
+            x = (int) (rect.getWidth() + rect.getX() - playPanel.getSCALE());
+            System.out.println(rect);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean wallOnRight(Rectangle rect) {
+        if ((rect.getX() <= collisionBox.getX() + collisionBox.getWidth()) && (rect.getX() + rect.getWidth() >= collisionBox.getX() + collisionBox.getWidth()) && ((rect.getY() + 1 < collisionBox.getY() && rect.getY() + rect.getHeight() - 1 > collisionBox.getY()) || (rect.getY() + 1 < collisionBox.getY() + collisionBox.getHeight() && rect.getY() + rect.getHeight() - 1 > collisionBox.getY()  + collisionBox.getHeight()))) {
+            x = (int) (rect.getX() - collisionBox.getWidth()) - playPanel.getSCALE();
+            System.out.println(rect);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -107,32 +168,33 @@ public class Player implements KeyListener{
         int input = e.getKeyCode();
         switch(input) {
             case KeyEvent.VK_UP:
-                if (!up) {
+                if (!up && !inAir) {
                     frameNumber = 0;
+                    up = true;
+                    jumpAnimation = true;
                 }
-                up = true;
                 break;
             case KeyEvent.VK_LEFT:
-                if (!left) {
+                if (!left && !jumpAnimation) {
                     frameNumber = 0;
                 }
                 facingRight = false;
                 facingLeft = true;
                 left = true;
-                System.out.println("LEFT");
+//                System.out.println("LEFT");
                 break;
             case KeyEvent.VK_DOWN:
                 down = true;
                 frameNumber = 0;
                 break;
             case KeyEvent.VK_RIGHT:
-                if (!right) {
+                if (!right && !jumpAnimation) {
                     frameNumber = 0;
                 }
                 facingLeft = false;
                 facingRight = true;
                 right = true;
-                System.out.println("RIGHT");
+//                System.out.println("RIGHT");
                 break;
         }
     }
@@ -142,18 +204,21 @@ public class Player implements KeyListener{
         int input = e.getKeyCode();
         switch(input) {
             case KeyEvent.VK_UP:
-                up = false;
                 break;
             case KeyEvent.VK_LEFT:
                 left = false;
-                frameNumber = 0;
+                if (!jumpAnimation) {
+                    frameNumber = 0;
+                }
                 break;
             case KeyEvent.VK_DOWN:
                 down = false;
                 break;
             case KeyEvent.VK_RIGHT:
                 right = false;
-                frameNumber = 0;
+                if (!jumpAnimation) {
+                    frameNumber = 0;
+                }
                 break;
         }
     }

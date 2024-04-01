@@ -27,7 +27,7 @@ public class Player implements KeyListener{
         facingLeft = false;
         facingRight = true;
         inAir = false;
-        collisionBox = new Rectangle(x + playPanel.getSCALE(), y, 13 * playPanel.getSCALE(), 22 * playPanel.getSCALE() + 1);
+        collisionBox = new Rectangle(x + playPanel.getSCALE(), y, 13 * playPanel.getSCALE(), 22 * playPanel.getSCALE());
         try {
             walkR = ImageIO.read(new File("image/Mage_WalkR.png"));
             walkL = ImageIO.read(new File("image/Mage_WalkL.png"));
@@ -35,7 +35,7 @@ public class Player implements KeyListener{
             jumpL = ImageIO.read(new File("image/Mage_JumpL.png"));
             standR = ImageIO.read(new File("image/Mage_StandR.png"));
             standL = ImageIO.read(new File("image/Mage_StandL.png"));
-        } catch (IOException ignored) {}
+        } catch (IOException e) {}
     }
 
     public void update() {
@@ -56,7 +56,7 @@ public class Player implements KeyListener{
             inAir = true;
         }
         if (!up && inAir) {
-            y += 6;
+            y += 5;
         }
         else if (up) {
             y -= 3;
@@ -103,7 +103,7 @@ public class Player implements KeyListener{
             framesPassed = 0;
         }
     }
-    //the standing left animation is wrong
+    //the standing left animation is wrong and the jumping animation is a little messed up
     public void draw(Graphics2D g) {
         BufferedImage image = null;
         if (jumpAnimation && facingRight) {
@@ -133,29 +133,21 @@ public class Player implements KeyListener{
 
     //Don't know if true but the player can most likely walk through walls if the wall is smaller than the player and the wall is at player's chest level
     public boolean touchingPlatform(Rectangle rect) {
-        if (collisionBox.intersects(rect)) {
-            y = (int) (rect.getY() - collisionBox.getHeight() + 1);
+        if ((rect.getY() + rect.getHeight() >= collisionBox.getY() + collisionBox.getHeight()) && (rect.getY() <= collisionBox.getY() + collisionBox.getHeight()) && ((rect.getX() < collisionBox.getX() && rect.getX() + rect.getWidth() > collisionBox.getX()) || (rect.getX() < collisionBox.getX() + collisionBox.getWidth() && rect.getX() + rect.getWidth() > collisionBox.getX() + collisionBox.getWidth()))) {
+            y = (int) (rect.getY() - collisionBox.getHeight());
             return true;
         }
         return false;
     }
-
+//Problem is after the player touches a corer, ends on top of the box, and holds left as they land they
+//solution: make everything pixel perfect
     public boolean wallOnLeft(Rectangle rect) {
-        if ((rect.getX() + rect.getWidth() >= collisionBox.getX()) && (rect.getX() <= collisionBox.getX()) && ((rect.getY() + 1 < collisionBox.getY() && rect.getY() + rect.getHeight() - 1 > collisionBox.getY()) || (rect.getY() + 1 < collisionBox.getY() + collisionBox.getHeight() && rect.getY() + rect.getHeight() - 1 > collisionBox.getY()  + collisionBox.getHeight()))) {
-            x = (int) (rect.getWidth() + rect.getX() - playPanel.getSCALE());
-            System.out.println(rect);
-            return true;
-        }
-        return false;
+        //first two statements determine if the player has clipped into the wall. The next one determines if the player is on the same y level as the wall
+        return (rect.getX() + rect.getWidth() >= collisionBox.getX()) && (rect.getX() <= collisionBox.getX()) && ((rect.getY() + 1 < collisionBox.getY() && rect.getY() + rect.getHeight() - 1 > collisionBox.getY()) || (rect.getY() < (collisionBox.getY() + collisionBox.getHeight()) && rect.getY() + rect.getHeight() > collisionBox.getY()  + collisionBox.getHeight()));
     }
 
     public boolean wallOnRight(Rectangle rect) {
-        if ((rect.getX() <= collisionBox.getX() + collisionBox.getWidth()) && (rect.getX() + rect.getWidth() >= collisionBox.getX() + collisionBox.getWidth()) && ((rect.getY() + 1 < collisionBox.getY() && rect.getY() + rect.getHeight() - 1 > collisionBox.getY()) || (rect.getY() + 1 < collisionBox.getY() + collisionBox.getHeight() && rect.getY() + rect.getHeight() - 1 > collisionBox.getY()  + collisionBox.getHeight()))) {
-            x = (int) (rect.getX() - collisionBox.getWidth()) - playPanel.getSCALE();
-            System.out.println(rect);
-            return true;
-        }
-        return false;
+        return (rect.getX() <= collisionBox.getX() + collisionBox.getWidth()) && (rect.getX() + rect.getWidth() >= collisionBox.getX() + collisionBox.getWidth()) && ((rect.getY() + 1 < collisionBox.getY() && rect.getY() + rect.getHeight() - 1 > collisionBox.getY()) || (rect.getY() + 1 < collisionBox.getY() + collisionBox.getHeight() && rect.getY() + rect.getHeight() - 1 > collisionBox.getY()  + collisionBox.getHeight()));
     }
 
     @Override

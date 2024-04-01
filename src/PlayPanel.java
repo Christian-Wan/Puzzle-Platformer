@@ -21,9 +21,9 @@ public class PlayPanel extends JPanel implements MouseListener {
         setFocusable(true);
         this.frame = frame;
         portal =  new Portal(this);
-        tempPlatform = new Rectangle(10, 300, 400, 10);
-        tempPlatform2 = new Rectangle(10, 220, 50, 150);
-        tempPlatform3 = new Rectangle(400, 220, 50, 150);
+        tempPlatform = new Rectangle(-100, 300, 4000, 10);
+        tempPlatform2 = new Rectangle(40, 250, 110, 150);
+        tempPlatform3 = new Rectangle(401, 220, 110, 150);
         backButton = new Rectangle(0, 0, 50, 50);
 
     }
@@ -56,6 +56,10 @@ public class PlayPanel extends JPanel implements MouseListener {
         g2.fillRect(tempPlatform.x, tempPlatform.y, tempPlatform.width, tempPlatform.height);
         g2.fillRect(tempPlatform2.x, tempPlatform2.y, tempPlatform2.width, tempPlatform2.height);
         g2.fillRect(tempPlatform3.x, tempPlatform3.y, tempPlatform3.width, tempPlatform3.height);
+        g2.setColor(Color.RED);
+        g2.drawRect(tempPlatform2.x, tempPlatform2.y, tempPlatform2.width, tempPlatform2.height);
+        g2.drawRect(tempPlatform.x, tempPlatform.y, tempPlatform.width, tempPlatform.height);
+        g2.drawRect(tempPlatform3.x, tempPlatform3.y, tempPlatform3.width, tempPlatform3.height);
         g.drawRect((int) backButton.getX(), (int) backButton.getY(), (int) backButton.getWidth(), (int) backButton.getHeight());
 
     }

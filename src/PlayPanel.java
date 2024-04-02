@@ -10,6 +10,7 @@ public class PlayPanel extends JPanel implements MouseListener {
 
     private Portal portal;
     private Player player;
+    private LevelLayout levelLayout;
     private final int SCALE = 5;
     private Frame frame;
     private Rectangle tempPlatform, tempPlatform2, tempPlatform3, backButton;
@@ -17,6 +18,7 @@ public class PlayPanel extends JPanel implements MouseListener {
     public PlayPanel(Frame frame) {
         addMouseListener(this);
         player = new Player(this);
+        levelLayout = new LevelLayout("level1");
         addKeyListener(player);
         setFocusable(true);
         this.frame = frame;
@@ -51,8 +53,10 @@ public class PlayPanel extends JPanel implements MouseListener {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
+        levelLayout.draw(g2);
         portal.draw(g2);
         player.draw(g2);
+
         g2.fillRect(tempPlatform.x, tempPlatform.y, tempPlatform.width, tempPlatform.height);
         g2.fillRect(tempPlatform2.x, tempPlatform2.y, tempPlatform2.width, tempPlatform2.height);
         g2.fillRect(tempPlatform3.x, tempPlatform3.y, tempPlatform3.width, tempPlatform3.height);

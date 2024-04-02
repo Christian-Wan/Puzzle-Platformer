@@ -18,11 +18,11 @@ public class PlayPanel extends JPanel implements MouseListener {
     public PlayPanel(Frame frame) {
         addMouseListener(this);
         player = new Player(this);
-        levelLayout = new LevelLayout("level1");
+        portal =  new Portal(this);
+        levelLayout = new LevelLayout("level1", player, portal);
         addKeyListener(player);
         setFocusable(true);
         this.frame = frame;
-        portal =  new Portal(this);
         tempPlatform = new Rectangle(-100, 300, 4000, 10);
         tempPlatform2 = new Rectangle(40, 250, 110, 150);
         tempPlatform3 = new Rectangle(401, 220, 110, 150);
@@ -47,13 +47,13 @@ public class PlayPanel extends JPanel implements MouseListener {
     }
 
     public void update() {
-        portal.update();
-        player.update();
+        levelLayout.update();
     }
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
         levelLayout.draw(g2);
+        g.setColor(Color.BLACK);
         portal.draw(g2);
         player.draw(g2);
 

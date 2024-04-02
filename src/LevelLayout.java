@@ -13,9 +13,13 @@ public class LevelLayout {
     private BufferedImage combined;
     private ArrayList<Rectangle> walls;
     private String[][] levelData;
-    public LevelLayout(String fileName) {
+    private Player player;
+    private Portal portal;
+    public LevelLayout(String fileName, Player player, Portal portal) {
         levelData = getLevelData(fileName);
         combined = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_ARGB);
+        this.player = player;
+        this.portal = portal;
 
         setTileSet();
         setWalls();
@@ -45,56 +49,58 @@ public class LevelLayout {
         Graphics g = combined.getGraphics();
         walls = new ArrayList<Rectangle>();
         //make sure to put the things that won't be counted as walls here
-        String nonWallTiles = "";
-        for (int r = 0; r < 1; r++) {
-            for (int c = 0; c < 1; c++) {
+        String nonWallTiles = "p";
+        for (int r = 0; r < 4; r++) {
+            for (int c = 0; c < 6; c++) {
                 if (!nonWallTiles.contains(levelData[r][c])) {
                     //make sure that this has the right values
-                    walls.add(new Rectangle());
+                    walls.add(new Rectangle(c * 64, r * 64, 64, 64));
                 }
                 switch (levelData[r][c]) {
                     case "0":
-                        g.drawImage(topLeftCorner, r * 64, c * 64, 64, 64, null);
+                        g.drawImage(topLeftCorner, c * 64, r * 64, 64, 64, null);
                         break;
                     case "1":
-                        g.drawImage(upWall, r * 64, c * 64, 64, 64, null);
+                        g.drawImage(upWall, c * 64, r * 64, 64, 64, null);
                         break;
                     case "2":
-                        g.drawImage(topRightCorner, r * 64, c * 64, 64, 64, null);
+                        g.drawImage(topRightCorner, c * 64, r * 64, 64, 64, null);
                         break;
                     case "3":
-                        g.drawImage(leftWall, r * 64, c * 64, 64, 64, null);
+                        g.drawImage(leftWall, c * 64, r * 64, 64, 64, null);
                         break;
                     case "4":
-                        g.drawImage(darkness, r * 64, c * 64, 64, 64, null);
+                        g.drawImage(darkness, c * 64, r * 64, 64, 64, null);
                         break;
                     case "5":
-                        g.drawImage(rightWall, r * 64, c * 64, 64, 64, null);
+                        g.drawImage(rightWall, c * 64, r * 64, 64, 64, null);
                         break;
                     case "6":
-                        g.drawImage(bottomLeftCorner, r * 64, c * 64, 64, 64, null);
+                        g.drawImage(bottomLeftCorner, c * 64, r * 64, 64, 64, null);
                         break;
                     case "7":
-                        g.drawImage(downWall, r * 64, c * 64, 64, 64, null);
+                        g.drawImage(downWall, c * 64, r * 64, 64, 64, null);
                         break;
                     case "8":
-                        g.drawImage(bottomRightCorner, r * 64, c * 64, 64, 64, null);
+                        g.drawImage(bottomRightCorner, c * 64, r * 64, 64, 64, null);
                         break;
                     case "q":
-                        g.drawImage(topLeftDarkness, r * 64, c * 64, 64, 64, null);
+                        g.drawImage(topLeftDarkness, c * 64, r * 64, 64, 64, null);
                         break;
                     case "w":
-                        g.drawImage(topRightDarkness, r * 64, c * 64, 64, 64, null);
+                        g.drawImage(topRightDarkness, c * 64, r * 64, 64, 64, null);
                         break;
                     case "a":
-                        g.drawImage(topLeftDarkness, r * 64, c * 64, 64, 64, null);
+                        g.drawImage(bottomLeftDarkness, c * 64, r * 64, 64, 64, null);
                         break;
                     case "s":
-                        g.drawImage(topRightDarkness, r * 64, c * 64, 64, 64, null);
+                        g.drawImage(bottomRightDarkness, c * 64, r * 64, 64, 64, null);
                         break;
+
                 }
             }
         }
+        System.out.println(walls.size());
         try {
             ImageIO.write(combined, "PNG", new File("image/test.png"));
         } catch (IOException e) {
@@ -102,22 +108,31 @@ public class LevelLayout {
         }
     }
     private String[][] getLevelData(String fileName) {
-        String[][] data = new String[1][1];
+        String[][] data = new String[4][6];
         File f = new File("level_data/" + fileName);
         Scanner s = null;
         try {
             s = new Scanner(f);
         } catch (FileNotFoundException e) {}
-        for (int c = 0; c < 1; c++) {
+        for (int c = 0; c < 4; c++) {
             String[] tiles = s.nextLine().split(" ");
-            for (int r = 0; r < 1; r++) {
+            for (int r = 0; r < 6; r++) {
                 data[c][r] = tiles[r];
             }
         }
         return data;
     }
     public void draw(Graphics2D g) {
-        g.drawImage(combined, 0, 0, null);
+        g.drawImage(combined, 300, 0, null);
+        g.setColor(Color.BLUE);
+        for (int i = 0; i < walls.size(); i++) {
+            g.drawRect((int) walls.get(i).getX(), (int) walls.get(i).getY(), (int) walls.get(i).getWidth(), (int) walls.get(i).getHeight());
+        }
 
+    }
+
+    public void update() {
+        player.update();
+        portal.update();
     }
 }

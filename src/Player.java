@@ -13,18 +13,17 @@ import java.util.logging.Level;
 public class Player implements KeyListener{
 
     private BufferedImage walkR, jumpR, standR, walkL, jumpL, standL;
+    private Engine engine;
     private int x, y, frameNumber, framesPassed, speed;
-    private PlayPanel playPanel;
     private boolean up, down, left, right, facingRight, facingLeft, jumpAnimation, inAir;
     private Rectangle collisionBox;
-    private LevelLayout levelLayout;
-    public Player(PlayPanel p) {
+    public Player(Engine engine) {
+        this.engine = engine;
         x = 100;
         y = 100;
         frameNumber = 0;
         framesPassed = 0;
         speed = 5;
-        playPanel = p;
         up = false;
         down = false;
         left = false;
@@ -32,7 +31,7 @@ public class Player implements KeyListener{
         facingLeft = false;
         facingRight = true;
         inAir = false;
-        collisionBox = new Rectangle(x + playPanel.getSCALE(), y, 13 * playPanel.getSCALE(), 22 * playPanel.getSCALE());
+        collisionBox = new Rectangle(x + engine.getSCALE(), y, 13 * engine.getSCALE(), 22 * engine.getSCALE());
         try {
             walkR = ImageIO.read(new File("image/Mage_WalkR.png"));
             walkL = ImageIO.read(new File("image/Mage_WalkL.png"));
@@ -42,11 +41,6 @@ public class Player implements KeyListener{
             standL = ImageIO.read(new File("image/Mage_StandL.png"));
         } catch (IOException e) {}
     }
-
-    public void setLevelLayout(LevelLayout levelLayout) {
-        this.levelLayout = levelLayout;
-    }
-
     public void setX(int x) {
         this.x = x;
     }
@@ -58,15 +52,15 @@ public class Player implements KeyListener{
     public void update() {
         framesPassed++;
 
-        if (right && !wallOnRight(levelLayout.getWalls())) {
+        if (right && !wallOnRight(engine.getLevelLayout().getWalls())) {
             x += 2;
         }
-        else if (left && !wallOnLeft(levelLayout.getWalls())) {
+        else if (left && !wallOnLeft(engine.getLevelLayout().getWalls())) {
             x -= 2;
         }
 
         //if touching platform send player to top of the platform
-        if (touchingPlatform(levelLayout.getWalls())) {
+        if (touchingPlatform(engine.getLevelLayout().getWalls())) {
             inAir = false;
         }
         else {
@@ -76,14 +70,14 @@ public class Player implements KeyListener{
         if (!up && inAir) {
             y += 5;
         }
-        else if (touchingCeiling(levelLayout.getWalls())) {
+        else if (touchingCeiling(engine.getLevelLayout().getWalls())) {
             up = false;
         }
         else if (up) {
             y -= 3;
         }
 
-        collisionBox.setLocation(x + playPanel.getSCALE(), y);
+        collisionBox.setLocation(x + engine.getSCALE(), y);
 
         if (framesPassed == 6) {
             if (jumpAnimation) {
@@ -147,7 +141,7 @@ public class Player implements KeyListener{
         else {
             image = standL.getSubimage(24 + (64 * (frameNumber / 3)), 21, 15, 23);
         }
-        g.drawImage(image, x, y, 15 * playPanel.getSCALE(), 23 * playPanel.getSCALE(), null);
+        g.drawImage(image, x, y, 15 * engine.getSCALE(), 23 * engine.getSCALE(), null);
         g.drawRect(collisionBox.x, collisionBox.y, collisionBox.width, collisionBox.height);
     }
 
@@ -188,6 +182,13 @@ public class Player implements KeyListener{
             if ((rect.getX() <= collisionBox.getX() + collisionBox.getWidth()) && (rect.getX() + rect.getWidth() >= collisionBox.getX() + collisionBox.getWidth()) && ((rect.getY() + 1 < collisionBox.getY() && rect.getY() + rect.getHeight() - 1 > collisionBox.getY()) || (rect.getY() + 1 < collisionBox.getY() + collisionBox.getHeight() && rect.getY() + rect.getHeight() - 1 > collisionBox.getY()  + collisionBox.getHeight()))) {
                 return true;
             }
+        }
+        return false;
+    }
+
+    public boolean reachEnd(Rectangle portal) {
+        if (portal.contains(collisionBox.getCenterX(), collisionBox.getCenterY())) {
+            return true;
         }
         return false;
     }

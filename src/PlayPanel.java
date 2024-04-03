@@ -8,20 +8,16 @@ import java.awt.event.MouseListener;
 
 public class PlayPanel extends JPanel implements MouseListener {
 
-    private Portal portal;
-    private Player player;
-    private LevelLayout levelLayout;
-    private final int SCALE = 2;
+    Engine engine;
     private Frame frame;
-    private Rectangle tempPlatform, tempPlatform2, tempPlatform3, backButton;
+    private Rectangle backButton;
+    private String level;
 
-    public PlayPanel(Frame frame) {
+    public PlayPanel(Frame frame, String level) {
         addMouseListener(this);
-        player = new Player(this);
-        portal = new Portal(this);
-        levelLayout = new LevelLayout("level1", this);
-        player.setLevelLayout(levelLayout);
-        addKeyListener(player);
+        this.level = level;
+        engine = new Engine(this);
+        addKeyListener(engine.getPlayer());
         setFocusable(true);
         this.frame = frame;
 
@@ -29,47 +25,23 @@ public class PlayPanel extends JPanel implements MouseListener {
 
     }
 
-    public Rectangle getTempPlatform() {
-        return tempPlatform;
-    }
-
-    public Rectangle getTempPlatform2() {
-        return tempPlatform2;
-    }
-
-    public Rectangle getTempPlatform3() {
-        return tempPlatform3;
-    }
-
-    public int getSCALE() {
-        return SCALE;
-    }
-
-    public Portal getPortal() {
-        return portal;
-    }
-
-    public Player getPlayer() {
-        return player;
-    }
-
-    public LevelLayout getLevelLayout() {
-        return levelLayout;
-    }
-
     public void update() {
-        levelLayout.update();
+        engine.getLevelLayout().update();
     }
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
-        levelLayout.draw(g2);
+        engine.getLevelLayout().draw(g2);
         g.setColor(Color.BLACK);
 
 
 
         g.drawRect((int) backButton.getX(), (int) backButton.getY(), (int) backButton.getWidth(), (int) backButton.getHeight());
 
+    }
+
+    public String getLevel() {
+        return level;
     }
 
     @Override

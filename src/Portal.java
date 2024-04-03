@@ -8,18 +8,19 @@ public class Portal {
 
     private BufferedImage portal;
     private int x, y, frameNumber, framesPassed;
-    private PlayPanel playPanel;
+    private Rectangle collision;
+    private Engine engine;
 
-
-    public Portal(PlayPanel p) {
+    public Portal(Engine engine) {
         try {
             portal = ImageIO.read(new File("image/portal.png"));
         } catch (IOException e) {}
+        this.engine = engine;
         x = 100;
         y = 100;
         framesPassed = 0;
         frameNumber = 0;
-        playPanel = p;
+        collision = new Rectangle(0, 0, 22 * engine.getSCALE(), 32 * engine.getSCALE());
     }
 
     public void update() {
@@ -44,7 +45,20 @@ public class Portal {
     public void draw(Graphics2D g) {
         BufferedImage image = portal.getSubimage(21 + (64 * (frameNumber)), 16, 22, 32);
 
-        g.drawImage(image, x, y, 22 * playPanel.getSCALE(), 32 * playPanel.getSCALE(), null);
+        g.drawImage(image, x, y, 22 * engine.getSCALE(), 32 * engine.getSCALE(), null);
     }
 
+    public void setX(int x) {
+        this.x = x;
+        collision.setLocation(x, this.y);
+    }
+
+    public void setY(int y) {
+        this.y = y;
+        collision.setLocation(this.x, y);
+    }
+
+    public Rectangle getCollision() {
+        return collision;
+    }
 }

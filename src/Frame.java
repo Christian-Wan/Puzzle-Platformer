@@ -11,7 +11,7 @@ public class Frame extends JFrame implements Runnable{
     public Frame() {
         activePanel = "Main Menu";
         mainMenuPanel = new MainMenuPanel(this);
-        playPanel = new PlayPanel(this);
+        playPanel = new PlayPanel(this, "level1");
         levelSelectionPanel = new LevelSelectionPanel(this);
         this.add(playPanel);
         this.add(levelSelectionPanel);
@@ -33,7 +33,7 @@ public class Frame extends JFrame implements Runnable{
         this.activePanel = activePanel;
         if (activePanel.equals("Play")) {
             levelSelectionPanel.setVisible(false);
-            playPanel = new PlayPanel(this);
+            playPanel = new PlayPanel(this, "level1");
             this.add(playPanel);
             playPanel.requestFocus();
         }

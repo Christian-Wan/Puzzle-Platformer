@@ -44,7 +44,7 @@ public class Portal {
     public void draw(Graphics2D g) {
         BufferedImage image = portal.getSubimage(21 + (64 * (frameNumber)), 16, 22, 32);
 
-        g.drawImage(image, x, y, 22 * playPanel.getSCALE(), 32 * 5, null);
+        g.drawImage(image, x, y, 22 * playPanel.getSCALE(), 32 * playPanel.getSCALE(), null);
     }
 
 }

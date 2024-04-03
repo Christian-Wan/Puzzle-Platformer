@@ -19,11 +19,12 @@ public class Frame extends JFrame implements Runnable{
         playPanel.setVisible(false);
         levelSelectionPanel.setVisible(false);
         mainMenuPanel.setVisible(true);
-        int frameWidth = 1000;
-        int frameHeight = 500;
+        int frameWidth = 1400;
+        int frameHeight = 900;
+        this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(frameWidth, frameHeight);
-        this.setLocation(600, 100);
+        this.setLocation(300, 100);
         this.setVisible(true);
         startThread();
     }

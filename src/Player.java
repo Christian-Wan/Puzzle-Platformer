@@ -5,7 +5,11 @@ import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.logging.Level;
 
+
+//IMPORTANT: MAKE SEPARATE ANIMATIONS FOR PLAYER MOVING UP, MOVING DOWN, AND LANDING
 public class Player implements KeyListener{
 
     private BufferedImage walkR, jumpR, standR, walkL, jumpL, standL;
@@ -13,6 +17,7 @@ public class Player implements KeyListener{
     private PlayPanel playPanel;
     private boolean up, down, left, right, facingRight, facingLeft, jumpAnimation, inAir;
     private Rectangle collisionBox;
+    private LevelLayout levelLayout;
     public Player(PlayPanel p) {
         x = 100;
         y = 100;
@@ -38,25 +43,41 @@ public class Player implements KeyListener{
         } catch (IOException e) {}
     }
 
+    public void setLevelLayout(LevelLayout levelLayout) {
+        this.levelLayout = levelLayout;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+
     public void update() {
         framesPassed++;
 
-        if (right && (!wallOnRight(playPanel.getTempPlatform2()) && !wallOnRight(playPanel.getTempPlatform3()))) {
-            x += 3;
+        if (right && !wallOnRight(levelLayout.getWalls())) {
+            x += 2;
         }
-        else if (left && (!wallOnLeft(playPanel.getTempPlatform2()) && !wallOnLeft(playPanel.getTempPlatform3()))) {
-            x -= 3;
+        else if (left && !wallOnLeft(levelLayout.getWalls())) {
+            x -= 2;
         }
 
         //if touching platform send player to top of the platform
-        if (touchingPlatform(playPanel.getTempPlatform()) || touchingPlatform(playPanel.getTempPlatform2()) || touchingPlatform(playPanel.getTempPlatform3())) {
+        if (touchingPlatform(levelLayout.getWalls())) {
             inAir = false;
         }
         else {
             inAir = true;
         }
+
         if (!up && inAir) {
             y += 5;
+        }
+        else if (touchingCeiling(levelLayout.getWalls())) {
+            up = false;
         }
         else if (up) {
             y -= 3;
@@ -126,28 +147,49 @@ public class Player implements KeyListener{
         else {
             image = standL.getSubimage(24 + (64 * (frameNumber / 3)), 21, 15, 23);
         }
-        g.drawImage(image, x, y, 14 * playPanel.getSCALE(), 23 * playPanel.getSCALE(), null);
+        g.drawImage(image, x, y, 15 * playPanel.getSCALE(), 23 * playPanel.getSCALE(), null);
         g.drawRect(collisionBox.x, collisionBox.y, collisionBox.width, collisionBox.height);
     }
 
 
     //Don't know if true but the player can most likely walk through walls if the wall is smaller than the player and the wall is at player's chest level
-    public boolean touchingPlatform(Rectangle rect) {
-        if ((rect.getY() + rect.getHeight() >= collisionBox.getY() + collisionBox.getHeight()) && (rect.getY() <= collisionBox.getY() + collisionBox.getHeight()) && ((rect.getX() < collisionBox.getX() && rect.getX() + rect.getWidth() > collisionBox.getX()) || (rect.getX() < collisionBox.getX() + collisionBox.getWidth() && rect.getX() + rect.getWidth() > collisionBox.getX() + collisionBox.getWidth()))) {
-            y = (int) (rect.getY() - collisionBox.getHeight());
-            return true;
+    public boolean touchingPlatform(ArrayList<Rectangle> rectangles) {
+        for (Rectangle rect: rectangles) {
+            if ((rect.getY() + rect.getHeight() >= collisionBox.getY() + collisionBox.getHeight()) && (rect.getY() <= collisionBox.getY() + collisionBox.getHeight()) && ((rect.getX() < collisionBox.getX() && rect.getX() + rect.getWidth() > collisionBox.getX()) || (rect.getX() < collisionBox.getX() + collisionBox.getWidth() && rect.getX() + rect.getWidth() > collisionBox.getX() + collisionBox.getWidth()))) {
+                y = (int) (rect.getY() - collisionBox.getHeight());
+                return true;
+            }
+        }
+        return false;
+    }
+    public boolean touchingCeiling(ArrayList<Rectangle> rectangles) {
+        for (Rectangle rect: rectangles) {
+            if (rect.getY() + rect.getHeight() >= collisionBox.getY() && rect.getY() <= collisionBox.getY() && ((rect.getX() < collisionBox.getX() && rect.getX() + rect.getWidth() > collisionBox.getX()) || (rect.getX() < collisionBox.getX() + collisionBox.getWidth() && rect.getX() + rect.getWidth() > collisionBox.getX() + collisionBox.getWidth()))) {
+//                y = (int) (rect.getY() + collisionBox.getHeight());
+                return true;
+            }
         }
         return false;
     }
 //Problem is after the player touches a corer, ends on top of the box, and holds left as they land they
 //solution: make everything pixel perfect
-    public boolean wallOnLeft(Rectangle rect) {
+    public boolean wallOnLeft(ArrayList<Rectangle> rectangles) {
+        for (Rectangle rect: rectangles) {
+            if ((rect.getX() + rect.getWidth() >= collisionBox.getX()) && (rect.getX() <= collisionBox.getX()) && ((rect.getY() + 1 < collisionBox.getY() && rect.getY() + rect.getHeight() - 1 > collisionBox.getY()) || (rect.getY() < (collisionBox.getY() + collisionBox.getHeight()) && rect.getY() + rect.getHeight() > collisionBox.getY()  + collisionBox.getHeight()))) {
+                return true;
+            }
+        }
         //first two statements determine if the player has clipped into the wall. The next one determines if the player is on the same y level as the wall
-        return (rect.getX() + rect.getWidth() >= collisionBox.getX()) && (rect.getX() <= collisionBox.getX()) && ((rect.getY() + 1 < collisionBox.getY() && rect.getY() + rect.getHeight() - 1 > collisionBox.getY()) || (rect.getY() < (collisionBox.getY() + collisionBox.getHeight()) && rect.getY() + rect.getHeight() > collisionBox.getY()  + collisionBox.getHeight()));
+        return false;
     }
 
-    public boolean wallOnRight(Rectangle rect) {
-        return (rect.getX() <= collisionBox.getX() + collisionBox.getWidth()) && (rect.getX() + rect.getWidth() >= collisionBox.getX() + collisionBox.getWidth()) && ((rect.getY() + 1 < collisionBox.getY() && rect.getY() + rect.getHeight() - 1 > collisionBox.getY()) || (rect.getY() + 1 < collisionBox.getY() + collisionBox.getHeight() && rect.getY() + rect.getHeight() - 1 > collisionBox.getY()  + collisionBox.getHeight()));
+    public boolean wallOnRight(ArrayList<Rectangle> rectangles) {
+        for (Rectangle rect: rectangles) {
+            if ((rect.getX() <= collisionBox.getX() + collisionBox.getWidth()) && (rect.getX() + rect.getWidth() >= collisionBox.getX() + collisionBox.getWidth()) && ((rect.getY() + 1 < collisionBox.getY() && rect.getY() + rect.getHeight() - 1 > collisionBox.getY()) || (rect.getY() + 1 < collisionBox.getY() + collisionBox.getHeight() && rect.getY() + rect.getHeight() - 1 > collisionBox.getY()  + collisionBox.getHeight()))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

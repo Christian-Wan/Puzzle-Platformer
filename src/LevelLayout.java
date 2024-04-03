@@ -1,4 +1,5 @@
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -15,12 +16,13 @@ public class LevelLayout {
     private String[][] levelData;
     private Player player;
     private Portal portal;
-    public LevelLayout(String fileName, Player player, Portal portal) {
+    private PlayPanel playPanel;
+    public LevelLayout(String fileName, PlayPanel p) {
         levelData = getLevelData(fileName);
         combined = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_ARGB);
-        this.player = player;
-        this.portal = portal;
-
+        playPanel = p;
+        player = p.getPlayer();
+        portal = p.getPortal();
         setTileSet();
         setWalls();
     }
@@ -49,8 +51,8 @@ public class LevelLayout {
         Graphics g = combined.getGraphics();
         walls = new ArrayList<Rectangle>();
         //make sure to put the things that won't be counted as walls here
-        String nonWallTiles = "p";
-        for (int r = 0; r < 4; r++) {
+        String nonWallTiles = "pz";
+        for (int r = 0; r < 5; r++) {
             for (int c = 0; c < 6; c++) {
                 if (!nonWallTiles.contains(levelData[r][c])) {
                     //make sure that this has the right values
@@ -96,7 +98,9 @@ public class LevelLayout {
                     case "s":
                         g.drawImage(bottomRightDarkness, c * 64, r * 64, 64, 64, null);
                         break;
-
+                    case "p":
+                        player.setX(c * 64);
+                        player.setY(r * 64);
                 }
             }
         }
@@ -108,13 +112,13 @@ public class LevelLayout {
         }
     }
     private String[][] getLevelData(String fileName) {
-        String[][] data = new String[4][6];
+        String[][] data = new String[5][6];
         File f = new File("level_data/" + fileName);
         Scanner s = null;
         try {
             s = new Scanner(f);
         } catch (FileNotFoundException e) {}
-        for (int c = 0; c < 4; c++) {
+        for (int c = 0; c < 5; c++) {
             String[] tiles = s.nextLine().split(" ");
             for (int r = 0; r < 6; r++) {
                 data[c][r] = tiles[r];
@@ -123,16 +127,21 @@ public class LevelLayout {
         return data;
     }
     public void draw(Graphics2D g) {
-        g.drawImage(combined, 300, 0, null);
+        g.drawImage(combined, 0, 0, null);
         g.setColor(Color.BLUE);
         for (int i = 0; i < walls.size(); i++) {
             g.drawRect((int) walls.get(i).getX(), (int) walls.get(i).getY(), (int) walls.get(i).getWidth(), (int) walls.get(i).getHeight());
         }
-
+        portal.draw(g);
+        player.draw(g);
     }
 
     public void update() {
         player.update();
         portal.update();
+    }
+
+    public ArrayList<Rectangle> getWalls() {
+        return walls;
     }
 }

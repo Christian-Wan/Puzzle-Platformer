@@ -29,15 +29,15 @@ public class Portal {
             if (frameNumber != 19) {
                 frameNumber++;
                 if (frameNumber == 5 || frameNumber == 10) {
-                    y -= 5;
+                    y -= 2;
                 }
                 else if (frameNumber == 15) {
-                    y += 5;
+                    y += 2;
                 }
             }
             else {
                 frameNumber = 0;
-                y += 5;
+                y += 2;
             }
             framesPassed = 0;
         }

@@ -18,7 +18,7 @@ public class LevelLayout {
 
     public LevelLayout(Engine engine) {
         this.engine = engine;
-        levelData = getLevelData(engine.getPlayPanel().getLevel());
+        levelData = getLevelData("level1");
         combined = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_ARGB);
         setTileSet();
         setWalls();
@@ -129,6 +129,7 @@ public class LevelLayout {
         return data;
     }
     public void draw(Graphics2D g) {
+        engine.getPlayBackground().draw(g);
         g.drawImage(combined, 0, 0, null);
         g.setColor(Color.BLUE);
         for (int i = 0; i < walls.size(); i++) {
@@ -136,11 +137,13 @@ public class LevelLayout {
         }
         engine.getPortal().draw(g);
         engine.getPlayer().draw(g);
+        System.out.println("QWE");
     }
 
     public void update() {
         engine.getPlayer().update();
         engine.getPortal().update();
+        System.out.println("LKJ");
     }
 
     public ArrayList<Rectangle> getWalls() {

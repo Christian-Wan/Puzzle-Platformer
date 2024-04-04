@@ -8,41 +8,37 @@ import java.awt.event.MouseListener;
 
 public class PlayPanel extends JPanel implements MouseListener {
 
-    Engine engine;
+    private Engine engine;
     private Frame frame;
     private Rectangle backButton;
-    private String level;
 
-    public PlayPanel(Frame frame, String level) {
+    public PlayPanel(Frame frame) {
         addMouseListener(this);
-        this.level = level;
-        engine = new Engine(this);
+        engine = frame.getEngine();
         addKeyListener(engine.getPlayer());
         setFocusable(true);
         this.frame = frame;
-
         backButton = new Rectangle(0, 0, 50, 50);
-
     }
 
     public void update() {
         engine.getLevelLayout().update();
+        engine.getTransitions().update();
+        System.out.println("ZXC");
     }
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
         engine.getLevelLayout().draw(g2);
-        g.setColor(Color.BLACK);
+        g.setColor(Color.YELLOW);
 
 
 
-        g.drawRect((int) backButton.getX(), (int) backButton.getY(), (int) backButton.getWidth(), (int) backButton.getHeight());
-
+        g.fillRect((int) backButton.getX(), (int) backButton.getY(), (int) backButton.getWidth(), (int) backButton.getHeight());
+        engine.getTransitions().draw(g2);
+        System.out.println("ASD");
     }
 
-    public String getLevel() {
-        return level;
-    }
 
     @Override
     public void mouseClicked(MouseEvent e) {
@@ -51,8 +47,8 @@ public class PlayPanel extends JPanel implements MouseListener {
         if (e.getButton() == 1) {
             System.out.println("ASKJDH");
             if (backButton.contains(clicked)) {
-                frame.setActivePanel("Level Select");
-                System.out.println("LKJ");
+                engine.getTransitions().setDesiredLocation("Level Select");
+                engine.getTransitions().setIn(true);
             }
         }
     }

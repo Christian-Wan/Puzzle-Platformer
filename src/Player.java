@@ -14,8 +14,8 @@ public class Player implements KeyListener{
 
     private BufferedImage walkR, jumpR, standR, walkL, jumpL, standL;
     private Engine engine;
-    private int x, y, frameNumber, framesPassed, speed;
-    private boolean up, down, left, right, facingRight, facingLeft, jumpAnimation, inAir;
+    private int x, y, frameNumber, framesPassed;
+    private boolean up, down, left, right, facingRight, facingLeft, jumpAnimation, inAir, reachedEnd;
     private Rectangle collisionBox;
     public Player(Engine engine) {
         this.engine = engine;
@@ -23,7 +23,6 @@ public class Player implements KeyListener{
         y = 100;
         frameNumber = 0;
         framesPassed = 0;
-        speed = 5;
         up = false;
         down = false;
         left = false;
@@ -52,6 +51,10 @@ public class Player implements KeyListener{
     public void update() {
         framesPassed++;
 
+        if (reachEnd(engine.getPortal().getCollision())) {
+            reachedEnd = true;
+            System.out.println("ASDKH");
+        }
         if (right && !wallOnRight(engine.getLevelLayout().getWalls())) {
             x += 2;
         }

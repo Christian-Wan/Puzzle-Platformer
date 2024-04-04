@@ -1,24 +1,24 @@
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyListener;
+import java.util.concurrent.TimeUnit;
 
 public class Frame extends JFrame implements Runnable{
 
-    private PlayPanel playPanel;
-    private MainMenuPanel mainMenuPanel;
-    private LevelSelectionPanel levelSelectionPanel;
+    private Engine engine;
     private Thread windowThread;
     private String activePanel;
     public Frame() {
+        engine = new Engine(this);
+        engine.makePanels();
         activePanel = "Main Menu";
-        mainMenuPanel = new MainMenuPanel(this);
-        playPanel = new PlayPanel(this, "level1");
-        levelSelectionPanel = new LevelSelectionPanel(this);
-        this.add(playPanel);
-        this.add(levelSelectionPanel);
-        this.add(mainMenuPanel);
-        playPanel.setVisible(false);
-        levelSelectionPanel.setVisible(false);
-        mainMenuPanel.setVisible(true);
+        this.add(engine.getPlayPanel());
+        this.add(engine.getLevelSelectionPanel());
+        this.add(engine.getMainMenuPanel());
+        engine.getPlayPanel().setVisible(false);
+        engine.getLevelSelectionPanel().setVisible(false);
+        engine.getMainMenuPanel().setVisible(true);
         int frameWidth = 1400;
         int frameHeight = 900;
         this.setResizable(false);
@@ -29,32 +29,44 @@ public class Frame extends JFrame implements Runnable{
         startThread();
     }
 
-    public void setActivePanel(String activePanel) {
+    public void changeActivePanel(String activePanel) {
         this.activePanel = activePanel;
         if (activePanel.equals("Play")) {
-            levelSelectionPanel.setVisible(false);
-            playPanel = new PlayPanel(this, "level1");
-            this.add(playPanel);
-            playPanel.requestFocus();
+            engine.getTransitions().setOut(true);
+            this.remove(engine.getLevelSelectionPanel());
+            engine.getLevelSelectionPanel().setVisible(false);
+            this.add(engine.getPlayPanel());
+            engine.getPlayPanel().setVisible(true);
+            engine.getPlayPanel().requestFocus();
         }
         else if (activePanel.equals("Level Select")) {
-            playPanel.setVisible(false);
-            mainMenuPanel.setVisible(false);
-            levelSelectionPanel = new LevelSelectionPanel(this);
-            this.add(levelSelectionPanel);
-            levelSelectionPanel.requestFocus();
+            engine.getTransitions().setOut(true);
+            this.remove(engine.getPlayPanel());
+            this.remove(engine.getMainMenuPanel());
+            engine.getPlayPanel().setVisible(false);
+            engine.getMainMenuPanel().setVisible(false);
+            this.add(engine.getLevelSelectionPanel());
+            engine.getLevelSelectionPanel().setVisible(true);
+            engine.getLevelSelectionPanel().requestFocus();
         }
         else {
-            levelSelectionPanel.setVisible(false);
-            mainMenuPanel = new MainMenuPanel(this);
-            this.add(mainMenuPanel);
-            mainMenuPanel.requestFocus();
+            engine.getTransitions().setOut(true);
+            this.remove(engine.getLevelSelectionPanel());
+            engine.getLevelSelectionPanel().setVisible(false);
+            this.add(engine.getMainMenuPanel());
+            engine.getMainMenuPanel().setVisible(true);
+            engine.getMainMenuPanel().requestFocus();
         }
     }
+
 
     public void startThread() {
         windowThread = new Thread(this);
         windowThread.start();
+    }
+
+    public Engine getEngine() {
+        return engine;
     }
 
     @Override
@@ -64,11 +76,16 @@ public class Frame extends JFrame implements Runnable{
 
         while (true) {
             if (activePanel.equals("Play")) {
-                playPanel.update();
-                playPanel.repaint();
+                engine.getPlayPanel().update();
+                engine.getPlayPanel().repaint();
             }
             else if (activePanel.equals("Main Menu")) {
-                mainMenuPanel.repaint();
+                engine.getMainMenuPanel().update();
+                engine.getMainMenuPanel().repaint();
+            }
+            else {
+                engine.getLevelSelectionPanel().update();
+                engine.getLevelSelectionPanel().repaint();
             }
 
             try {

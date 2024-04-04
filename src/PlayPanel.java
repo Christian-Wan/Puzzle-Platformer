@@ -24,7 +24,7 @@ public class PlayPanel extends JPanel implements MouseListener {
     public void update() {
         engine.getLevelLayout().update();
         engine.getTransitions().update();
-        System.out.println("ZXC");
+//        System.out.println("ZXC");
     }
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -36,7 +36,7 @@ public class PlayPanel extends JPanel implements MouseListener {
 
         g.fillRect((int) backButton.getX(), (int) backButton.getY(), (int) backButton.getWidth(), (int) backButton.getHeight());
         engine.getTransitions().draw(g2);
-        System.out.println("ASD");
+//        System.out.println("ASD");
     }
 
 

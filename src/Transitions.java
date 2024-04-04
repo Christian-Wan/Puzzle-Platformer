@@ -6,6 +6,8 @@ import java.io.IOException;
 
 public class Transitions {
 
+
+    //Make a transition for after the player wins
     private BufferedImage transitionAnimation;
     private boolean in, out;
     private int frameNumber, framesPassed;

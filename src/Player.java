@@ -17,6 +17,7 @@ public class Player implements KeyListener{
     private int x, y, frameNumber, framesPassed;
     private boolean up, down, left, right, facingRight, facingLeft, jumpAnimation, inAir, reachedEnd;
     private Rectangle collisionBox;
+    //3 child classes that will be the mage knight and ?
     public Player(Engine engine) {
         this.engine = engine;
         x = 100;
@@ -30,7 +31,7 @@ public class Player implements KeyListener{
         facingLeft = false;
         facingRight = true;
         inAir = false;
-        collisionBox = new Rectangle(x + engine.getSCALE(), y, 13 * engine.getSCALE(), 22 * engine.getSCALE());
+        collisionBox = new Rectangle(x + engine.getSCALE(), y, 17 * engine.getSCALE(), 24 * engine.getSCALE());
         try {
             walkR = ImageIO.read(new File("image/Mage_WalkR.png"));
             walkL = ImageIO.read(new File("image/Mage_WalkL.png"));
@@ -144,7 +145,7 @@ public class Player implements KeyListener{
         else {
             image = standL.getSubimage(24 + (64 * (frameNumber / 3)), 21, 15, 23);
         }
-        g.drawImage(image, x, y, 15 * engine.getSCALE(), 23 * engine.getSCALE(), null);
+        g.drawImage(image, x, y, 17 * engine.getSCALE(), 25 * engine.getSCALE(), null);
         g.drawRect(collisionBox.x, collisionBox.y, collisionBox.width, collisionBox.height);
     }
 

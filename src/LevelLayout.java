@@ -16,11 +16,15 @@ public class LevelLayout {
     private ArrayList<Rectangle> walls;
     private String[][] levelData;
     private Engine engine;
+    private ArrayList<Player> availableCharacters;
+    private int characterInControl;
 
     //Have like a list of all the characters that the player can control and when a character reaches the portal remove them from the list
 
     public LevelLayout(Engine engine, String fileName) {
         this.engine = engine;
+        characterInControl = 0;
+        availableCharacters = new ArrayList<Player>();
         levelData = getLevelData(fileName);
         combined = new BufferedImage(1500, 900, BufferedImage.TYPE_INT_ARGB);
         setTileSet();
@@ -55,7 +59,7 @@ public class LevelLayout {
         Graphics g = combined.getGraphics();
         walls = new ArrayList<Rectangle>();
         //make sure to put the things that won't be counted as walls here
-        String nonWallTiles = "pze";
+        String nonWallTiles = "pzek";
         for (int r = 0; r < 12; r++) {
             for (int c = 0; c < 20; c++) {
                 if (!nonWallTiles.contains(levelData[r][c])) {
@@ -103,13 +107,17 @@ public class LevelLayout {
                         g.drawImage(bottomRightDarkness, c * 76, r * 76, 76, 76, null);
                         break;
                     case "p":
-                        engine.newPlayer(c * 76 + 14, r * 76 + 14);
-
+                        engine.newWizard(c * 76 + 14, r * 76 + 14);
+                        availableCharacters.add(engine.getWizard());
                         break;
                     case "e":
                         engine.getPortal().setX(c * 76 + 16);
                         engine.getPortal().setY(r * 76 + 10);
                         break;
+                    case "k":
+                        engine.newKnight(c * 76 + 14, r * 76 + 14);
+
+                        availableCharacters.add(engine.getKnight());
                 }
             }
         }
@@ -143,12 +151,16 @@ public class LevelLayout {
             g.drawRect((int) walls.get(i).getX(), (int) walls.get(i).getY(), (int) walls.get(i).getWidth(), (int) walls.get(i).getHeight());
         }
         engine.getPortal().draw(g);
-        engine.getPlayer().draw(g);
+        for (Player character: availableCharacters) {
+            character.draw(g);
+        }
 //        System.out.println("QWE");
     }
 
     public void update() {
-        engine.getPlayer().update();
+        for (Player character: availableCharacters) {
+            character.update();
+        }
         engine.getPortal().update();
 //        System.out.println("LKJ");
     }

@@ -221,6 +221,17 @@ public class Player implements KeyListener{
         return false;
     }
 
+    public void doAbility() {
+        System.out.println("Ability");
+    }
+
+    public void resetStage() {
+        System.out.println("Reset");
+    }
+
+    public void changeCharacter() {
+
+    }
     @Override
     public void keyTyped(KeyEvent e) {
 
@@ -259,6 +270,15 @@ public class Player implements KeyListener{
                 facingRight = true;
                 right = true;
 //                System.out.println("RIGHT");
+                break;
+            case KeyEvent.VK_E:
+                doAbility();
+                break;
+            case KeyEvent.VK_R:
+                resetStage();
+                break;
+            case KeyEvent.VK_Q:
+                changeCharacter();
                 break;
         }
     }

@@ -1,5 +1,7 @@
 public class Engine {
     private Player player;
+    private Wizard wizard;
+    private Knight knight;
     private Portal portal;
     private LevelLayout levelLayout;
     private PlayBackground playBackground;
@@ -33,6 +35,15 @@ public class Engine {
     public void newPlayer(int x, int y) {
         player = new Player(this, x, y);
         playPanel.addKeyListener(player);
+    }
+    public void newWizard(int x, int y) {
+        wizard = new Wizard(this, x, y);
+        playPanel.addKeyListener(wizard);
+    }
+
+    public void newKnight(int x, int y) {
+        knight = new Knight(this, x, y);
+        playPanel.addKeyListener(knight);
     }
 
     public Player getPlayer() {
@@ -73,5 +84,13 @@ public class Engine {
 
     public LevelSelectionPanel getLevelSelectionPanel() {
         return levelSelectionPanel;
+    }
+
+    public Wizard getWizard() {
+        return wizard;
+    }
+
+    public Knight getKnight() {
+        return knight;
     }
 }

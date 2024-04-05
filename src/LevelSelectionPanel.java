@@ -6,7 +6,8 @@ import java.util.logging.Level;
 
 public class LevelSelectionPanel extends JPanel implements MouseListener {
 
-    private Rectangle backButton, startLevelButton;
+    private Rectangle backButton;
+    private Rectangle[][] levels;
     private Frame frame;
     private Engine engine;
     public LevelSelectionPanel(Frame frame) {
@@ -14,10 +15,15 @@ public class LevelSelectionPanel extends JPanel implements MouseListener {
         setFocusable(true);
         engine = frame.getEngine();
         backButton = new Rectangle(50, 50, 50, 50);
-        startLevelButton = new Rectangle(150, 150, 100, 100);
+        createLevels();
         this.frame = frame;
     }
 
+    public void createLevels() {
+        levels = new Rectangle[3][5];
+        levels[0][0] = new Rectangle(50, 150, 50, 50);
+        levels[0][1] = new Rectangle(150, 150, 50, 50);
+    }
     public void update() {
         engine.getTransitions().update();
     }
@@ -25,7 +31,13 @@ public class LevelSelectionPanel extends JPanel implements MouseListener {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
         g2.drawRect((int) backButton.getX(), (int) backButton.getY(), (int) backButton.getWidth(), (int) backButton.getHeight());
-        g2.drawRect((int) startLevelButton.getX(), (int) startLevelButton.getY(), (int) startLevelButton.getWidth(), (int) startLevelButton.getHeight());
+        for (Rectangle[] row: levels) {
+            for (Rectangle level: row) {
+                if (level != null) {
+                    g2.drawRect((int) level.getX(), (int) level.getY(), (int) level.getWidth(), (int) level.getHeight());
+                }
+            }
+        }
         engine.getTransitions().draw(g2);
 
     }
@@ -41,9 +53,17 @@ public class LevelSelectionPanel extends JPanel implements MouseListener {
                 engine.getTransitions().setIn(true);
             }
 
-            if (startLevelButton.contains(clicked)) {
-                engine.getTransitions().setDesiredLocation("Play");
-                engine.getTransitions().setIn(true);
+            for (int r = 0; r < 3; r++) {
+                for (int c = 0; c < 5; c ++) {
+
+                    if (levels[r][c] != null) {
+                        if (levels[r][c].contains(clicked)) {
+                            engine.newLevelLayout(r * 5 + c + 1);
+                            engine.getTransitions().setDesiredLocation("Play");
+                            engine.getTransitions().setIn(true);
+                        }
+                    }
+                }
             }
         }
     }

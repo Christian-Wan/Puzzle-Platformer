@@ -6,6 +6,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+//When the player presses q it changes to the next character this might be able to be done if there is a method that changes the key listener using a parameter and addKeyListener()
 public class PlayPanel extends JPanel implements MouseListener {
 
     private Engine engine;
@@ -21,6 +22,9 @@ public class PlayPanel extends JPanel implements MouseListener {
         backButton = new Rectangle(0, 0, 50, 50);
     }
 
+    public void changeKeyListener(Player player) {
+        addKeyListener(player);
+    }
     public void update() {
         engine.getLevelLayout().update();
         engine.getTransitions().update();

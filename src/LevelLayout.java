@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.logging.Level;
 
 public class LevelLayout {
 
@@ -18,12 +19,16 @@ public class LevelLayout {
 
     //Have like a list of all the characters that the player can control and when a character reaches the portal remove them from the list
 
-    public LevelLayout(Engine engine) {
+    public LevelLayout(Engine engine, String fileName) {
         this.engine = engine;
-        levelData = getLevelData("level1");
+        levelData = getLevelData(fileName);
         combined = new BufferedImage(1500, 900, BufferedImage.TYPE_INT_ARGB);
         setTileSet();
         setWalls();
+    }
+
+    public LevelLayout(Engine engine) {
+        this.engine = engine;
     }
 
     private void setTileSet() {
@@ -98,8 +103,8 @@ public class LevelLayout {
                         g.drawImage(bottomRightDarkness, c * 76, r * 76, 76, 76, null);
                         break;
                     case "p":
-                        engine.getPlayer().setX(c * 76);
-                        engine.getPlayer().setY(r * 76);
+                        engine.newPlayer(c * 76 + 14, r * 76 + 14);
+
                         break;
                     case "e":
                         engine.getPortal().setX(c * 76 + 16);

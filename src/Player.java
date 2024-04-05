@@ -41,6 +41,30 @@ public class Player implements KeyListener{
             standL = ImageIO.read(new File("image/Mage_StandL.png"));
         } catch (IOException e) {}
     }
+
+    public Player(Engine engine, int x, int y) {
+        this.engine = engine;
+        this.x = x;
+        this.y = y;
+        frameNumber = 0;
+        framesPassed = 0;
+        up = false;
+        down = false;
+        left = false;
+        right = false;
+        facingLeft = false;
+        facingRight = true;
+        inAir = false;
+        collisionBox = new Rectangle(x + engine.getSCALE(), y, 17 * engine.getSCALE(), 24 * engine.getSCALE());
+        try {
+            walkR = ImageIO.read(new File("image/Mage_WalkR.png"));
+            walkL = ImageIO.read(new File("image/Mage_WalkL.png"));
+            jumpR = ImageIO.read(new File("image/Mage_JumpR.png"));
+            jumpL = ImageIO.read(new File("image/Mage_JumpL.png"));
+            standR = ImageIO.read(new File("image/Mage_StandR.png"));
+            standL = ImageIO.read(new File("image/Mage_StandL.png"));
+        } catch (IOException e) {}
+    }
     public void setX(int x) {
         this.x = x;
     }
@@ -209,6 +233,7 @@ public class Player implements KeyListener{
             case KeyEvent.VK_UP:
                 if (!up && !inAir) {
                     frameNumber = 0;
+                    System.out.println(y);
                     up = true;
                     jumpAnimation = true;
                 }

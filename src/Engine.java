@@ -26,6 +26,15 @@ public class Engine {
         levelSelectionPanel = new LevelSelectionPanel(frame);
     }
 
+    public void newLevelLayout(int level) {
+        levelLayout = new LevelLayout(this, "level" + level);
+    }
+
+    public void newPlayer(int x, int y) {
+        player = new Player(this, x, y);
+        playPanel.addKeyListener(player);
+    }
+
     public Player getPlayer() {
         return player;
     }

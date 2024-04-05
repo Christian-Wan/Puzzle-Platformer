@@ -69,13 +69,13 @@ public class Transitions {
     public void draw(Graphics2D g) {
         BufferedImage image = null;
         if (in) {
-            image = transitionAnimation.getSubimage(frameNumber * 1400, 0, 1400, 900);
+            image = transitionAnimation.getSubimage(frameNumber * 1500, 0, 1500, 900);
 
         }
         else if (out) {
-            image = transitionAnimation.getSubimage(40600 - (frameNumber * 1400), 0, 1400, 900);
+            image = transitionAnimation.getSubimage(43500 - (frameNumber * 1500), 0, 1500, 900);
         }
 
-        g.drawImage(image, 0, 0, 1400, 900, null);
+        g.drawImage(image, 0, 0, 1500, 900, null);
     }
 }

@@ -16,15 +16,12 @@ public class PlayPanel extends JPanel implements MouseListener {
     public PlayPanel(Frame frame) {
         addMouseListener(this);
         engine = frame.getEngine();
-        addKeyListener(engine.getPlayer());
         setFocusable(true);
+        addKeyListener(engine.getPlayer());
         this.frame = frame;
         backButton = new Rectangle(0, 0, 50, 50);
     }
 
-    public void changeKeyListener(Player player) {
-        addKeyListener(player);
-    }
     public void update() {
         engine.getLevelLayout().update();
         engine.getTransitions().update();

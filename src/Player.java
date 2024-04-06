@@ -15,7 +15,8 @@ public class Player implements KeyListener{
     private BufferedImage walkR, jumpR, standR, walkL, jumpL, standL;
     private Engine engine;
     private int x, y, frameNumber, framesPassed;
-    private boolean up, down, left, right, facingRight, facingLeft, jumpAnimation, inAir, reachedEnd;
+    final private int SCALE = 2;
+    private boolean up, down, left, right, facingRight, facingLeft, jumpAnimation, inAir, available, active;
     private Rectangle collisionBox;
     //3 child classes that will be the mage knight and ?
     public Player(Engine engine) {
@@ -31,7 +32,7 @@ public class Player implements KeyListener{
         facingLeft = false;
         facingRight = true;
         inAir = false;
-        collisionBox = new Rectangle(x + engine.getSCALE(), y, 17 * engine.getSCALE(), 24 * engine.getSCALE());
+        collisionBox = new Rectangle(x + SCALE, y, 14 * SCALE, 22 * SCALE);
         try {
             walkR = ImageIO.read(new File("image/Mage_WalkR.png"));
             walkL = ImageIO.read(new File("image/Mage_WalkL.png"));
@@ -55,7 +56,9 @@ public class Player implements KeyListener{
         facingLeft = false;
         facingRight = true;
         inAir = false;
-        collisionBox = new Rectangle(x + engine.getSCALE(), y, 17 * engine.getSCALE(), 24 * engine.getSCALE());
+        available = true;
+        active = false;
+        collisionBox = new Rectangle(x + SCALE, y, 14 * SCALE, 22 * SCALE);
         try {
             walkR = ImageIO.read(new File("image/Mage_WalkR.png"));
             walkL = ImageIO.read(new File("image/Mage_WalkL.png"));
@@ -65,19 +68,18 @@ public class Player implements KeyListener{
             standL = ImageIO.read(new File("image/Mage_StandL.png"));
         } catch (IOException e) {}
     }
-    public void setX(int x) {
-        this.x = x;
-    }
 
-    public void setY(int y) {
-        this.y = y;
+    public boolean isAvailable() {
+        return available;
     }
 
     public void update() {
         framesPassed++;
 
         if (reachEnd(engine.getPortal().getCollision())) {
-            reachedEnd = true;
+            available = false;
+            engine.getLevelLayout().checkLevelDone();
+            engine.getLevelLayout().changeActive();
             System.out.println("ASDKH");
         }
         if (right && !wallOnRight(engine.getLevelLayout().getWalls())) {
@@ -105,7 +107,7 @@ public class Player implements KeyListener{
             y -= 3;
         }
 
-        collisionBox.setLocation(x + engine.getSCALE(), y);
+        collisionBox.setLocation(x + SCALE, y);
 
         if (framesPassed == 6) {
             if (jumpAnimation) {
@@ -169,7 +171,7 @@ public class Player implements KeyListener{
         else {
             image = standL.getSubimage(24 + (64 * (frameNumber / 3)), 21, 15, 23);
         }
-        g.drawImage(image, x, y, 17 * engine.getSCALE(), 25 * engine.getSCALE(), null);
+        g.drawImage(image, x, y, 15 * SCALE, 23 * SCALE, null);
         g.drawRect(collisionBox.x, collisionBox.y, collisionBox.width, collisionBox.height);
     }
 
@@ -221,6 +223,14 @@ public class Player implements KeyListener{
         return false;
     }
 
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
     public void doAbility() {
         System.out.println("Ability");
     }
@@ -229,9 +239,7 @@ public class Player implements KeyListener{
         System.out.println("Reset");
     }
 
-    public void changeCharacter() {
 
-    }
     @Override
     public void keyTyped(KeyEvent e) {
 
@@ -239,71 +247,79 @@ public class Player implements KeyListener{
 
     @Override
     public void keyPressed(KeyEvent e) {
-        int input = e.getKeyCode();
-        switch(input) {
-            case KeyEvent.VK_UP:
-                if (!up && !inAir) {
-                    frameNumber = 0;
-                    System.out.println(y);
-                    up = true;
-                    jumpAnimation = true;
-                }
-                break;
-            case KeyEvent.VK_LEFT:
-                if (!left && !jumpAnimation) {
-                    frameNumber = 0;
-                }
-                facingRight = false;
-                facingLeft = true;
-                left = true;
+        if (active) {
+            int input = e.getKeyCode();
+            switch (input) {
+                case KeyEvent.VK_UP:
+                    if (!up && !inAir) {
+                        frameNumber = 0;
+                        System.out.println(y);
+                        up = true;
+                        jumpAnimation = true;
+                    }
+                    break;
+                case KeyEvent.VK_LEFT:
+                    if (!left && !jumpAnimation) {
+                        frameNumber = 0;
+                    }
+                    facingRight = false;
+                    facingLeft = true;
+                    left = true;
 //                System.out.println("LEFT");
-                break;
-            case KeyEvent.VK_DOWN:
-                down = true;
-                frameNumber = 0;
-                break;
-            case KeyEvent.VK_RIGHT:
-                if (!right && !jumpAnimation) {
+                    break;
+                case KeyEvent.VK_DOWN:
+                    down = true;
                     frameNumber = 0;
-                }
-                facingLeft = false;
-                facingRight = true;
-                right = true;
+                    break;
+                case KeyEvent.VK_RIGHT:
+                    if (!right && !jumpAnimation) {
+                        frameNumber = 0;
+                    }
+                    facingLeft = false;
+                    facingRight = true;
+                    right = true;
 //                System.out.println("RIGHT");
-                break;
-            case KeyEvent.VK_E:
-                doAbility();
-                break;
-            case KeyEvent.VK_R:
-                resetStage();
-                break;
-            case KeyEvent.VK_Q:
-                changeCharacter();
-                break;
+                    break;
+                case KeyEvent.VK_E:
+                    doAbility();
+                    break;
+                case KeyEvent.VK_R:
+                    System.out.println("ASD" + this);
+                    resetStage();
+                    break;
+                case KeyEvent.VK_Q:
+                    System.out.println("ASD" + this);
+                    right = false;
+                    left = false;
+                    engine.getLevelLayout().changeActive();
+                    break;
+            }
         }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        int input = e.getKeyCode();
-        switch(input) {
-            case KeyEvent.VK_UP:
-                break;
-            case KeyEvent.VK_LEFT:
-                left = false;
-                if (!jumpAnimation) {
-                    frameNumber = 0;
-                }
-                break;
-            case KeyEvent.VK_DOWN:
-                down = false;
-                break;
-            case KeyEvent.VK_RIGHT:
-                right = false;
-                if (!jumpAnimation) {
-                    frameNumber = 0;
-                }
-                break;
+        if (active) {
+            int input = e.getKeyCode();
+            switch (input) {
+                case KeyEvent.VK_UP:
+                    break;
+                case KeyEvent.VK_LEFT:
+                    left = false;
+                    if (!jumpAnimation) {
+                        frameNumber = 0;
+                    }
+                    break;
+                case KeyEvent.VK_DOWN:
+                    down = false;
+                    break;
+                case KeyEvent.VK_RIGHT:
+                    right = false;
+                    if (!jumpAnimation) {
+                        frameNumber = 0;
+                    }
+                    break;
+            }
         }
     }
 }

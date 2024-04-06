@@ -17,6 +17,7 @@ public class LevelLayout {
     private String[][] levelData;
     private Engine engine;
     private ArrayList<Player> availableCharacters;
+    private boolean levelDone, swapped;
     private int characterInControl;
 
     //Have like a list of all the characters that the player can control and when a character reaches the portal remove them from the list
@@ -26,6 +27,9 @@ public class LevelLayout {
         characterInControl = 0;
         availableCharacters = new ArrayList<Player>();
         levelData = getLevelData(fileName);
+        levelDone = false;
+        characterInControl = 0;
+        swapped = false;
         combined = new BufferedImage(1500, 900, BufferedImage.TYPE_INT_ARGB);
         setTileSet();
         setWalls();
@@ -127,6 +131,7 @@ public class LevelLayout {
         } catch (IOException e) {
             System.out.println("fail");
         }
+        availableCharacters.get(0).setActive(true);
     }
     private String[][] getLevelData(String fileName) {
         String[][] data = new String[12][20];
@@ -143,6 +148,35 @@ public class LevelLayout {
         }
         return data;
     }
+
+    public void checkLevelDone() {
+        boolean check = true;
+        for (Player character: availableCharacters) {
+            if (character.isAvailable()) {
+                check = false;
+            }
+        }
+        levelDone = check;
+    }
+
+    public void changeActive() {
+        if (!swapped && !levelDone) {
+            int current = characterInControl + 1;
+            while (current != characterInControl) {
+                if (current == availableCharacters.size()) {
+                    current = 0;
+                } else {
+                    if (availableCharacters.get(current).isAvailable()) {
+                        availableCharacters.get(characterInControl).setActive(false);
+                        availableCharacters.get(current).setActive(true);
+                        characterInControl = current;
+                    }
+                }
+            }
+            swapped = true;
+        }
+    }
+
     public void draw(Graphics2D g) {
         engine.getPlayBackground().draw(g);
         g.drawImage(combined, 0, 0, null);
@@ -152,17 +186,28 @@ public class LevelLayout {
         }
         engine.getPortal().draw(g);
         for (Player character: availableCharacters) {
-            character.draw(g);
+            if (character.isAvailable()) {
+                character.draw(g);
+            }
         }
 //        System.out.println("QWE");
     }
 
     public void update() {
-        for (Player character: availableCharacters) {
-            character.update();
-        }
-        engine.getPortal().update();
+        if (!levelDone) {
+            for (Player character : availableCharacters) {
+                if (character.isAvailable()) {
+                    character.update();
+                }
+            }
+            engine.getPortal().update();
 //        System.out.println("LKJ");
+        }
+        else {
+            engine.getTransitions().setDesiredLocation("Level Select");
+            engine.getTransitions().setIn(true);
+        }
+        swapped = false;
     }
 
     public ArrayList<Rectangle> getWalls() {

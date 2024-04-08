@@ -13,7 +13,7 @@ public class Portal {
 
     public Portal(Engine engine) {
         try {
-            portal = ImageIO.read(new File("image/portal.png"));
+            portal = ImageIO.read(new File("image/Level_Assets/portal.png"));
         } catch (IOException e) {}
         this.engine = engine;
         x = 100;

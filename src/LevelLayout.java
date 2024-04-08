@@ -17,7 +17,7 @@ public class LevelLayout {
     private String[][] levelData;
     private Engine engine;
     private ArrayList<Player> availableCharacters;
-    private boolean levelDone, swapped;
+    private boolean levelDone, swapped, resetting;
     private int characterInControl;
 
     //Have like a list of all the characters that the player can control and when a character reaches the portal remove them from the list
@@ -42,7 +42,7 @@ public class LevelLayout {
     private void setTileSet() {
         BufferedImage tileset = null;
         try {
-            tileset = ImageIO.read(new File("image/Walls_Tileset.png"));
+            tileset = ImageIO.read(new File("image/Level_Assets/Walls_Tileset.png"));
         } catch (IOException e) {}
         topLeftCorner = tileset.getSubimage(16, 16, 32, 32);
         upWall = tileset.getSubimage(64, 16, 32, 32);
@@ -59,7 +59,7 @@ public class LevelLayout {
         bottomRightDarkness = tileset.getSubimage(208, 64, 32, 32);
     }
 
-    private void setWalls() {
+    public void setWalls() {
         Graphics g = combined.getGraphics();
         walls = new ArrayList<Rectangle>();
         //make sure to put the things that won't be counted as walls here
@@ -111,7 +111,7 @@ public class LevelLayout {
                         g.drawImage(bottomRightDarkness, c * 76, r * 76, 76, 76, null);
                         break;
                     case "p":
-                        engine.newWizard(c * 76 + 14, r * 76 + 14);
+                        engine.newWizard(c * 76 + 14, r * 76 + 32);
                         availableCharacters.add(engine.getWizard());
                         break;
                     case "e":
@@ -119,7 +119,7 @@ public class LevelLayout {
                         engine.getPortal().setY(r * 76 + 10);
                         break;
                     case "k":
-                        engine.newKnight(c * 76 + 14, r * 76 + 14);
+                        engine.newKnight(c * 76 + 14, r * 76 + 32);
 
                         availableCharacters.add(engine.getKnight());
                 }
@@ -149,6 +149,22 @@ public class LevelLayout {
         return data;
     }
 
+    public void resetStage() {
+        int counter = 0;
+        String characters = "pk";
+        for (int r = 0; r < 12; r++) {
+            for (int c = 0; c < 12; c++) {
+                if (characters.contains(levelData[r][c])) {
+                    availableCharacters.get(counter).setX(c * 76 + 14);
+                    availableCharacters.get(counter).setY(r * 76 + 32);
+                    availableCharacters.get(counter).setAvailable(true);
+                    resetting = true;
+                    counter++;
+                }
+            }
+        }
+    }
+
     public void checkLevelDone() {
         boolean check = true;
         for (Player character: availableCharacters) {
@@ -164,16 +180,19 @@ public class LevelLayout {
             int current = characterInControl + 1;
             while (current != characterInControl) {
                 if (current == availableCharacters.size()) {
-                    current = 0;
-                } else {
-                    if (availableCharacters.get(current).isAvailable()) {
-                        availableCharacters.get(characterInControl).setActive(false);
-                        availableCharacters.get(current).setActive(true);
-                        characterInControl = current;
-                    }
+                    current = -1;
                 }
+                else if(availableCharacters.get(current).isAvailable()) {
+                    availableCharacters.get(characterInControl).setActive(false);
+                    availableCharacters.get(current).setActive(true);
+                    characterInControl = current;
+                    swapped = true;
+                    break;
+                }
+                current++;
+                System.out.println("current: " + current);
+                System.out.println(characterInControl);
             }
-            swapped = true;
         }
     }
 
@@ -200,6 +219,11 @@ public class LevelLayout {
                     character.update();
                 }
             }
+            //not really sure why this is needed. For some reason it needs two separate updates to actually bring back the player
+            if (resetting) {
+                resetStage();
+                resetting = false;
+            }
             engine.getPortal().update();
 //        System.out.println("LKJ");
         }
@@ -212,5 +236,9 @@ public class LevelLayout {
 
     public ArrayList<Rectangle> getWalls() {
         return walls;
+    }
+
+    public ArrayList<Player> getAvailableCharacters() {
+        return availableCharacters;
     }
 }

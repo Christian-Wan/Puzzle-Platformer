@@ -10,7 +10,7 @@ public class PlayBackground {
 
     public PlayBackground() {
         try {
-            background1 = ImageIO.read(new File("image/Background.png"));
+            background1 = ImageIO.read(new File("image/Level_Assets/Background.png"));
         } catch (IOException e) {}
     }
 

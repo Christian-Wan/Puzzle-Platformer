@@ -19,6 +19,7 @@ public class LevelLayout {
     private ArrayList<Player> availableCharacters;
     private boolean levelDone, swapped, resetting;
     private int characterInControl;
+    private ArrayList<Box> boxes;
 
     //Have like a list of all the characters that the player can control and when a character reaches the portal remove them from the list
 
@@ -63,7 +64,7 @@ public class LevelLayout {
         Graphics g = combined.getGraphics();
         walls = new ArrayList<Rectangle>();
         //make sure to put the things that won't be counted as walls here
-        String nonWallTiles = "pzek";
+        String nonWallTiles = "pzekb";
         for (int r = 0; r < 12; r++) {
             for (int c = 0; c < 20; c++) {
                 if (!nonWallTiles.contains(levelData[r][c])) {
@@ -120,8 +121,10 @@ public class LevelLayout {
                         break;
                     case "k":
                         engine.newKnight(c * 76 + 14, r * 76 + 32);
-
                         availableCharacters.add(engine.getKnight());
+                        break;
+                    case "b":
+                        boxes.add(new Box(engine, c * 76 + 16, r * 76 + 32));
                 }
             }
         }

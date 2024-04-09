@@ -31,6 +31,7 @@ public class LevelLayout {
         levelDone = false;
         characterInControl = 0;
         swapped = false;
+        boxes = new ArrayList<Box>();
         combined = new BufferedImage(1500, 900, BufferedImage.TYPE_INT_ARGB);
         setTileSet();
         setWalls();
@@ -124,7 +125,8 @@ public class LevelLayout {
                         availableCharacters.add(engine.getKnight());
                         break;
                     case "b":
-                        boxes.add(new Box(engine, c * 76 + 16, r * 76 + 32));
+                        boxes.add(new Box(engine, c * 76 + 22, r * 76 + 44));
+                        System.out.println(boxes);
                 }
             }
         }
@@ -206,6 +208,9 @@ public class LevelLayout {
         for (int i = 0; i < walls.size(); i++) {
             g.drawRect((int) walls.get(i).getX(), (int) walls.get(i).getY(), (int) walls.get(i).getWidth(), (int) walls.get(i).getHeight());
         }
+        for (Box box: boxes) {
+            box.draw(g);
+        }
         engine.getPortal().draw(g);
         for (Player character: availableCharacters) {
             if (character.isAvailable()) {
@@ -243,5 +248,9 @@ public class LevelLayout {
 
     public ArrayList<Player> getAvailableCharacters() {
         return availableCharacters;
+    }
+
+    public ArrayList<Box> getBoxes() {
+        return boxes;
     }
 }

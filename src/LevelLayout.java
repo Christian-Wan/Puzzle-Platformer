@@ -227,6 +227,9 @@ public class LevelLayout {
                     character.update();
                 }
             }
+            for (Box box: boxes) {
+                box.update();
+            }
             //not really sure why this is needed. For some reason it needs two separate updates to actually bring back the player
             if (resetting) {
                 resetStage();

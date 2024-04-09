@@ -34,6 +34,55 @@ public class Box {
         }
         return false;
     }
+    public boolean wallOnLeft(ArrayList<Rectangle> rectangles, int x) {
+        for (Rectangle rect: rectangles) {
+            if ((rect.getX() + rect.getWidth() >= x) && (rect.getX() <= x) && ((rect.getY() < collisionBox.getY() && rect.getY() + rect.getHeight() > collisionBox.getY()) || (rect.getY() < (collisionBox.getY() + collisionBox.getHeight()) && rect.getY() + rect.getHeight() > collisionBox.getY()  + collisionBox.getHeight()))) {
+                return true;
+            }
+        }
+        //first two statements determine if the player has clipped into the wall. The next one determines if the player is on the same y level as the wall
+        return false;
+    }
+
+    public boolean wallOnRight(ArrayList<Rectangle> rectangles, int x) {
+        for (Rectangle rect: rectangles) {
+            if ((rect.getX() <= x + collisionBox.getWidth()) && (rect.getX() + rect.getWidth() >= x + collisionBox.getWidth()) && ((rect.getY() < collisionBox.getY() && rect.getY() + rect.getHeight() > collisionBox.getY()) || (rect.getY() < collisionBox.getY() + collisionBox.getHeight() && rect.getY() + rect.getHeight() > collisionBox.getY()  + collisionBox.getHeight()))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean playerOnLeft(ArrayList<Player> players, int x) {
+        for (Player player: players) {
+            if ((player.getX() + player.getCollisionBox().width >= x) && (player.getX() <= x) && ((player.getY() < collisionBox.getY() && player.getY() + player.getCollisionBox().height > collisionBox.getY()) || (player.getY() < (collisionBox.getY() + collisionBox.getHeight()) && player.getY() + player.getCollisionBox().height > collisionBox.getY()  + collisionBox.getHeight()))) {
+                return true;
+            }
+        }
+        //first two statements determine if the player has clipped into the wall. The next one determines if the player is on the same y level as the wall
+        return false;
+    }
+
+    public boolean playerOnRight(ArrayList<Player> players, int x) {
+        for (Player player: players) {
+            if ((player.getCollisionBox().x + engine.getSCALE() <= x + collisionBox.getWidth()) && (player.getCollisionBox().x + engine.getSCALE() + player.getCollisionBox().width >= x + collisionBox.getWidth()) && ((player.getY() < collisionBox.getY() && player.getY() + player.getCollisionBox().height > collisionBox.getY()) || (player.getY() < collisionBox.getY() + collisionBox.getHeight() && player.getY() + player.getCollisionBox().height > collisionBox.getY()  + collisionBox.getHeight()))) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public void changeX(int change) {
+        if (change > 0) {
+            if (!wallOnRight(engine.getLevelLayout().getWalls(), x + change) && !playerOnRight(engine.getLevelLayout().getAvailableCharacters(), x + change)) {
+                x += change;
+            }
+        }
+        if (change < 0) {
+            if (!wallOnLeft(engine.getLevelLayout().getWalls(), x + change) && !playerOnLeft(engine.getLevelLayout().getAvailableCharacters(), x + change)) {
+                x += change;
+            }
+        }
+    }
     public void update() {
         velocity++;
         if (!touchingPlatform(engine.getLevelLayout().getWalls())) {

@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.awt.event.KeyEvent;
 
 public class Wizard extends Player {
 
@@ -20,7 +21,15 @@ public class Wizard extends Player {
             abilityActive = true;
         }
         else {
-            setX(storedX);
+            if (isRight()) {
+                setX(storedX - 2);
+            }
+            else if (isLeft()) {
+                setX(storedX + 2);
+            }
+            else {
+                setX(storedX);
+            }
             setY(storedY);
             abilityActive = false;
         }
@@ -31,6 +40,14 @@ public class Wizard extends Player {
         super.draw(g);
         if (abilityActive) {
             g.drawRect(storedX, storedY, 10, 10);
+        }
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        super.keyPressed(e);
+        if (e.getKeyCode() == KeyEvent.VK_R) {
+            abilityActive = false;
         }
     }
 }

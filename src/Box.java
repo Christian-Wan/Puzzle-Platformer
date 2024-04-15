@@ -26,9 +26,8 @@ public class Box {
 
     public boolean touchingPlatform(ArrayList<Rectangle> rectangles) {
         for (Rectangle rect: rectangles) {
-            if ((rect.getY() + rect.getHeight() >= collisionBox.getY() + collisionBox.getHeight()) && (rect.getY() <= collisionBox.getY() + collisionBox.getHeight()) && ((rect.getX() < collisionBox.getX() && rect.getX() + rect.getWidth() > collisionBox.getX()) || (rect.getX() < collisionBox.getX() + collisionBox.getWidth() && rect.getX() + rect.getWidth() > collisionBox.getX() + collisionBox.getWidth()))) {
+            if ((rect.getY() + rect.getHeight() >= collisionBox.getY() + collisionBox.getHeight()) && (rect.getY() <= collisionBox.getY() + collisionBox.getHeight()) && ((rect.getX() < collisionBox.getX() && rect.getX() + rect.getWidth() > collisionBox.getX()) || (rect.getX() < collisionBox.getX() + collisionBox.getWidth() && rect.getX() + rect.getWidth() > collisionBox.getX() + collisionBox.getWidth()) || (rect.getX() < collisionBox.getCenterX() && rect.getX() + rect.getWidth() > collisionBox.getCenterX()))) {
                 onCollisionBox = rect;
-                velocity = 4;
                 return true;
             }
         }
@@ -36,7 +35,7 @@ public class Box {
     }
     public boolean wallOnLeft(ArrayList<Rectangle> rectangles, int x) {
         for (Rectangle rect: rectangles) {
-            if ((rect.getX() + rect.getWidth() >= x) && (rect.getX() <= x) && ((rect.getY() < collisionBox.getY() && rect.getY() + rect.getHeight() > collisionBox.getY()) || (rect.getY() < (collisionBox.getY() + collisionBox.getHeight()) && rect.getY() + rect.getHeight() > collisionBox.getY()  + collisionBox.getHeight()))) {
+            if ((rect.getX() + rect.getWidth() > x) && (rect.getX() < x) && ((rect.getY() < collisionBox.getY() && rect.getY() + rect.getHeight() > collisionBox.getY()) || (rect.getY() < (collisionBox.getY() + collisionBox.getHeight()) && rect.getY() + rect.getHeight() > collisionBox.getY()  + collisionBox.getHeight()))) {
                 return true;
             }
         }
@@ -46,7 +45,16 @@ public class Box {
 
     public boolean wallOnRight(ArrayList<Rectangle> rectangles, int x) {
         for (Rectangle rect: rectangles) {
-            if ((rect.getX() <= x + collisionBox.getWidth()) && (rect.getX() + rect.getWidth() >= x + collisionBox.getWidth()) && ((rect.getY() < collisionBox.getY() && rect.getY() + rect.getHeight() > collisionBox.getY()) || (rect.getY() < collisionBox.getY() + collisionBox.getHeight() && rect.getY() + rect.getHeight() > collisionBox.getY()  + collisionBox.getHeight()))) {
+            if ((rect.getX() < x + collisionBox.getWidth()) && (rect.getX() + rect.getWidth() > x + collisionBox.getWidth()) && ((rect.getY() < collisionBox.getY() && rect.getY() + rect.getHeight() > collisionBox.getY()) || (rect.getY() < collisionBox.getY() + collisionBox.getHeight() && rect.getY() + rect.getHeight() > collisionBox.getY()  + collisionBox.getHeight()) || (rect.getY() < collisionBox.getCenterY() && rect.getY() + rect.getHeight() > collisionBox.getCenterY()))) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public boolean playerBelow(ArrayList<Player> players) {
+        for (Player player: players) {
+            if ((player.getY() + player.getCollisionBox().height >= collisionBox.getY() + collisionBox.getHeight()) && (player.getY() <= collisionBox.getY() + collisionBox.getHeight()) && ((player.getCollisionBox().getX() < collisionBox.getX() && player.getCollisionBox().getX() + player.getCollisionBox().getWidth() > collisionBox.getX()) || (player.getCollisionBox().getX() < collisionBox.getX() + collisionBox.getWidth() && player.getCollisionBox().getX() + player.getCollisionBox().getWidth() > collisionBox.getX() + collisionBox.getWidth()) || (collisionBox.getX() < player.getCollisionBox().getCenterX() && collisionBox.getX() + 32 > player.getCollisionBox().getCenterX()))) {
+                onCollisionBox = player.getCollisionBox();
                 return true;
             }
         }
@@ -71,7 +79,7 @@ public class Box {
         }
         return false;
     }
-    public void changeX(int change) {
+    public void checkChangeX(int change) {
         if (change > 0) {
             if (!wallOnRight(engine.getLevelLayout().getWalls(), x + change) && !playerOnRight(engine.getLevelLayout().getAvailableCharacters(), x + change)) {
                 x += change;
@@ -84,17 +92,20 @@ public class Box {
         }
     }
     public void update() {
-        velocity++;
-        if (!touchingPlatform(engine.getLevelLayout().getWalls())) {
+        if (!touchingPlatform(engine.getLevelLayout().getWalls()) && !playerBelow(engine.getLevelLayout().getAvailableCharacters())) {
             y += velocity;
+            inAir = true;
+            velocityTimer++;
         }
         else {
             if (inAir) {
+                velocityTimer = 0;
                 inAir = false;
                 velocity = 4;
-                y = (int) onCollisionBox.getY() + 32;
+                y = (int) onCollisionBox.getY() - 32;
             }
         }
+        collisionBox.setLocation(x, y);
 
         if (velocityTimer == 18) {
             velocityTimer = 0;

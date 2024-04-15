@@ -6,7 +6,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
 
 
 //IMPORTANT: MAKE SEPARATE ANIMATIONS FOR PLAYER MOVING UP, MOVING DOWN, AND LANDING
@@ -16,9 +15,8 @@ public class Player implements KeyListener{
     private Engine engine;
     private int x, y, frameNumber, framesPassed, velocity, velocityTimer;
     final private int SCALE = 2;
-    private boolean up, down, left, right, facingRight, facingLeft, jumpAnimation, inAir, available, active, onTopOfBox;
+    private boolean up, down, left, right, facingRight, facingLeft, jumpAnimation, inAir, available, active;
     private Rectangle collisionBox, onCollisionBox;
-    private Box connectedBox;
     //3 child classes that will be the mage knight and ?
     public Player(Engine engine) {
         this.engine = engine;
@@ -77,6 +75,7 @@ public class Player implements KeyListener{
 
     public void update() {
         framesPassed++;
+        //Physics
         velocityTimer++;
         if (reachEnd(engine.getPortal().getCollision())) {
             available = false;
@@ -84,15 +83,9 @@ public class Player implements KeyListener{
             engine.getLevelLayout().changeActive();
             System.out.println("ASDKH");
         }
-        if (right && !wallOnRight(engine.getLevelLayout().getWalls()) && !boxOnRight(engine.getLevelLayout().getBoxes())) {
-            x += 2;
-        }
-        else if (left && !wallOnLeft(engine.getLevelLayout().getWalls()) && !boxOnLeft(engine.getLevelLayout().getBoxes())) {
-            x -= 2;
-        }
 
         //if touching platform send player to top of the platform
-        if (touchingPlatform(engine.getLevelLayout().getWalls()) || touchingBox(engine.getLevelLayout().getBoxes())) {
+        if (touchingPlatform(engine.getLevelLayout().getWalls()) || touchingBox(engine.getLevelLayout().getBoxes()) || onPlayer(engine.getLevelLayout().getAvailableCharacters())) {
             if (inAir) {
                 y = (int) (onCollisionBox.getY() - collisionBox.getHeight());
                 velocity = 4;
@@ -103,7 +96,14 @@ public class Player implements KeyListener{
             inAir = true;
         }
 
-        if (touchingCeiling(engine.getLevelLayout().getWalls())) {
+        if (right && !wallOnRight(engine.getLevelLayout().getWalls()) && !boxOnRight(engine.getLevelLayout().getBoxes()) && !playerOnRight(engine.getLevelLayout().getAvailableCharacters())) {
+            x += 2;
+        }
+        else if (left && !wallOnLeft(engine.getLevelLayout().getWalls()) && !boxOnLeft(engine.getLevelLayout().getBoxes()) && !playerOnLeft(engine.getLevelLayout().getAvailableCharacters())) {
+            x -= 2;
+        }
+
+        if (touchingCeiling(engine.getLevelLayout().getWalls()) || boxOnTop(engine.getLevelLayout().getBoxes()) || playerOnTop(engine.getLevelLayout().getAvailableCharacters())) {
             up = false;
             velocity = 3;
             velocityTimer = 0;
@@ -115,7 +115,7 @@ public class Player implements KeyListener{
             y += velocity;
         }
         if (velocityTimer % 18 == 0 && inAir) {
-            if (velocity != 6 && velocity > 0) {
+            if (velocity != 7 && velocity > 0) {
                 velocity++;
             }
             else if (velocity < 0) {
@@ -124,6 +124,7 @@ public class Player implements KeyListener{
         }
         collisionBox.setLocation(x + SCALE, y);
 
+        //Animations
         if (framesPassed == 6) {
             if (jumpAnimation) {
                 if (frameNumber != 10) {
@@ -173,11 +174,11 @@ public class Player implements KeyListener{
         else if (jumpAnimation && facingLeft) {
             image = jumpL.getSubimage(1 + (64 * frameNumber), 25, 15, 23);
         }
-        else if (right) {
+        else if ((left || right) && facingRight) {
             image = walkR.getSubimage(24 + (64 * frameNumber), 21, 15, 23);
 //            System.out.println("WALK");
         }
-        else if (left) {
+        else if ((left || right) && facingLeft) {
             image = walkL.getSubimage(24 + (64 * frameNumber), 21, 15, 23);
 //            System.out.println("WALK");
         }
@@ -205,10 +206,9 @@ public class Player implements KeyListener{
     public boolean touchingCeiling(ArrayList<Rectangle> rectangles) {
         for (Rectangle rect: rectangles) {
             if (rect.getY() + rect.getHeight() >= collisionBox.getY() && rect.getY() <= collisionBox.getY() && ((rect.getX() < collisionBox.getX() && rect.getX() + rect.getWidth() > collisionBox.getX()) || (rect.getX() < collisionBox.getX() + collisionBox.getWidth() && rect.getX() + rect.getWidth() > collisionBox.getX() + collisionBox.getWidth()))) {
-                System.out.println(y);
-                y = (int) (rect.getY() + rect.getHeight() + 1);
-                System.out.println(y + "ASD");
-                System.out.println("Touched");
+                if (inAir) {
+                    y = (int) (rect.getY() + rect.getHeight() + 1);
+                }
                 return true;
             }
         }
@@ -218,7 +218,7 @@ public class Player implements KeyListener{
 //solution: make everything pixel perfect
     public boolean wallOnLeft(ArrayList<Rectangle> rectangles) {
         for (Rectangle rect: rectangles) {
-            if ((rect.getX() + rect.getWidth() >= collisionBox.getX()) && (rect.getX() <= collisionBox.getX()) && ((rect.getY() < collisionBox.getY() && rect.getY() + rect.getHeight() > collisionBox.getY()) || (rect.getY() < (collisionBox.getY() + collisionBox.getHeight()) && rect.getY() + rect.getHeight() > collisionBox.getY()  + collisionBox.getHeight()))) {
+            if ((rect.getX() + rect.getWidth() >= collisionBox.getX()) && (rect.getX() <= collisionBox.getX()) && ((rect.getY() < collisionBox.getY() && rect.getY() + rect.getHeight() > collisionBox.getY()) || (rect.getY() < (collisionBox.getY() + collisionBox.getHeight()) && rect.getY() + rect.getHeight() > collisionBox.getY() + collisionBox.getHeight()) || (rect.getY() < collisionBox.getCenterY() && rect.getY() + rect.getHeight() > collisionBox.getCenterY()))) {
                 return true;
             }
         }
@@ -228,7 +228,7 @@ public class Player implements KeyListener{
 
     public boolean wallOnRight(ArrayList<Rectangle> rectangles) {
         for (Rectangle rect: rectangles) {
-            if ((rect.getX() <= collisionBox.getX() + collisionBox.getWidth()) && (rect.getX() + rect.getWidth() >= collisionBox.getX() + collisionBox.getWidth()) && ((rect.getY() < collisionBox.getY() && rect.getY() + rect.getHeight() > collisionBox.getY()) || (rect.getY() < collisionBox.getY() + collisionBox.getHeight() && rect.getY() + rect.getHeight() > collisionBox.getY()  + collisionBox.getHeight()))) {
+            if ((rect.getX() <= collisionBox.getX() + collisionBox.getWidth()) && (rect.getX() + rect.getWidth() >= collisionBox.getX() + collisionBox.getWidth()) && ((rect.getY() < collisionBox.getY() && rect.getY() + rect.getHeight() > collisionBox.getY()) || (rect.getY() < collisionBox.getY() + collisionBox.getHeight() && rect.getY() + rect.getHeight() > collisionBox.getY() + collisionBox.getHeight()) || (rect.getY() < collisionBox.getCenterY() && rect.getY() + rect.getHeight() > collisionBox.getCenterY()))) {
                 return true;
             }
         }
@@ -240,63 +240,91 @@ public class Player implements KeyListener{
         for (Box box: boxes) {
             if ((box.getY() + 32 >= collisionBox.getY() + collisionBox.getHeight()) && (box.getY() <= collisionBox.getY() + collisionBox.getHeight()) && ((box.getX() < collisionBox.getX() && box.getX() + 32 > collisionBox.getX()) || (box.getX() < collisionBox.getX() + collisionBox.getWidth() && box.getX() + 32 > collisionBox.getX() + collisionBox.getWidth()))) {
                 onCollisionBox = box.getCollisionBox();
-                onTopOfBox = true;
                 return true;
             }
         }
-        onTopOfBox = false;
+        return false;
+    }
+    public boolean boxOnTop(ArrayList<Box> boxes) {
+        for (Box box: boxes) {
+            if ((box.getY() + 32 >= collisionBox.getY()) && (box.getY() <= collisionBox.getY()) && ((box.getX() < collisionBox.getX() && box.getX() + 32 > collisionBox.getX()) || (box.getX() < collisionBox.getX() + collisionBox.getWidth() && box.getX() + 32 > collisionBox.getX() + collisionBox.getWidth()))) {
+                if (inAir) {
+                    y = (int) (box.getY() + box.getCollisionBox().getHeight() + 1);
+                }
+                return true;
+            }
+        }
         return false;
     }
     public boolean boxOnLeft(ArrayList<Box> boxes) {
         for (Box box: boxes) {
-            if (!onTopOfBox){
-                if ((box.getX() + 32 >= collisionBox.getX()) && (box.getX() <= collisionBox.getX()) && ((box.getY() <= collisionBox.getY() && box.getY() + 32 >= collisionBox.getY()) || (box.getY() <= (collisionBox.getY() + collisionBox.getHeight()) && box.getY() + 32 >= collisionBox.getY() + collisionBox.getHeight()))) {
-                    connectedBox = box;
-                    return true;
-                }
+            if ((box.getX() + 32 >= collisionBox.getX()) && (box.getX() <= collisionBox.getX()) && ((box.getY() < collisionBox.getY() && box.getY() + 32 > collisionBox.getY()) || (box.getY() < (collisionBox.getY() + collisionBox.getHeight()) && box.getY() + 32 > collisionBox.getY() + collisionBox.getHeight()) || (box.getY() <= collisionBox.getCenterY() && box.getY() + 32 >= collisionBox.getCenterY()))) {
+                return true;
             }
+
         }
-        //first two statements determine if the player has clipped into the wall. The next one determines if the player is on the same y level as the wall
-        connectedBox = null;
         return false;
     }
 
     public boolean boxOnRight(ArrayList<Box> boxes) {
         for (Box box: boxes) {
-            if (!onTopOfBox) {
-                if ((box.getX() <= collisionBox.getX() + collisionBox.getWidth()) && (box.getX() + 32 >= collisionBox.getX() + collisionBox.getWidth()) && ((box.getY() <= collisionBox.getY() && box.getY() + 32 >= collisionBox.getY()) || (box.getY() <= collisionBox.getY() + collisionBox.getHeight() && box.getY() + 32 >= collisionBox.getY() + collisionBox.getHeight()))) {
-                    connectedBox = box;
+            if ((box.getX() <= collisionBox.getX() + collisionBox.getWidth()) && (box.getX() + 32 >= collisionBox.getX() + collisionBox.getWidth()) && ((box.getY() < collisionBox.getY() && box.getY() + 32 > collisionBox.getY()) || (box.getY() < collisionBox.getY() + collisionBox.getHeight() && box.getY() + 32 > collisionBox.getY() + collisionBox.getHeight()) || (box.getY() <= collisionBox.getCenterY() && box.getY() + 32 >= collisionBox.getCenterY()))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean onPlayer(ArrayList<Player> players) {
+        for (Player player: players) {
+            if (player.isAvailable()) {
+                if (player != this && (player.getCollisionBox().getY() + player.getCollisionBox().getHeight() >= collisionBox.getY() + collisionBox.getHeight()) && (player.getCollisionBox().getY() <= collisionBox.getY() + collisionBox.getHeight()) && ((player.getCollisionBox().getX() < collisionBox.getX() && player.getCollisionBox().getX() + player.getCollisionBox().getWidth() > collisionBox.getX()) || (player.getCollisionBox().getX() < collisionBox.getX() + collisionBox.getWidth() && player.getCollisionBox().getX() + player.getCollisionBox().getWidth() > collisionBox.getX() + collisionBox.getWidth()) || (player.getCollisionBox().getX() < collisionBox.getCenterX() && player.getCollisionBox().getX() + player.getCollisionBox().getWidth() > collisionBox.getCenterX()))) {
+                    onCollisionBox = player.getCollisionBox();
                     return true;
                 }
             }
         }
-        connectedBox = null;
+        return false;
+    }
+    public boolean playerOnTop(ArrayList<Player> players) {
+        for (Player player: players) {
+            if (player.isAvailable()) {
+                if (player != this && (player.getCollisionBox().getY() + player.getCollisionBox().getHeight() >= collisionBox.getY()) && (player.getCollisionBox().getY() <= collisionBox.getY()) && ((player.getCollisionBox().getX() < collisionBox.getX() && player.getCollisionBox().getX() + player.getCollisionBox().getWidth() > collisionBox.getX()) || (player.getCollisionBox().getX() < collisionBox.getX() + collisionBox.getWidth() && player.getCollisionBox().getX() + player.getCollisionBox().getWidth() > collisionBox.getX() + collisionBox.getWidth()))) {
+                    if (inAir) {
+                        y = (int) (player.getY() + player.getCollisionBox().getHeight() + 1);
+                    }
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    public boolean playerOnLeft(ArrayList<Player> players) {
+        for (Player player: players) {
+            if (player.isAvailable()) {
+                if (player != this && (player.getCollisionBox().getX() + player.getCollisionBox().getWidth() >= collisionBox.getX()) && (player.getCollisionBox().getX() <= collisionBox.getX()) && ((player.getCollisionBox().getY() < collisionBox.getY() && player.getCollisionBox().getY() + player.getCollisionBox().getHeight() > collisionBox.getY()) || (player.getCollisionBox().getY() < (collisionBox.getY() + collisionBox.getHeight()) && player.getCollisionBox().getY() + player.getCollisionBox().getHeight() > collisionBox.getY() + collisionBox.getHeight()) || (player.getCollisionBox().getY() <= collisionBox.getCenterY() && player.getCollisionBox().getY() + player.getCollisionBox().getHeight() >= collisionBox.getCenterY()))) {
+                    return true;
+                }
+            }
+        }
+        //first two statements determine if the player has clipped into the wall. The next one determines if the player is on the same y level as the wall
         return false;
     }
 
-//    public boolean boxOnLeft(ArrayList<Box> boxes) {
-//        for (Box box: boxes) {
-//            if ((box.getX() + 32 >= collisionBox.getX()) && (box.getX() <= collisionBox.getX()) && ((box.getY() < collisionBox.getY() + 1 && box.getY() + 32 > collisionBox.getY() - 1) || (box.getY() < (collisionBox.getY() + collisionBox.getHeight() + 1) && box.getY() + 32 > collisionBox.getY()  + collisionBox.getHeight() - 1))) {
-//                connectedBox = box;
-//                return true;
-//            }
-//        }
-//        //first two statements determine if the player has clipped into the wall. The next one determines if the player is on the same y level as the wall
-//        connectedBox = null;
-//        return false;
-//    }
-//
-//    public boolean boxOnRight(ArrayList<Box> boxes) {
-//        for (Box box: boxes) {
-//            if ((box.getX() <= collisionBox.getX() + collisionBox.getWidth()) && (box.getX() + 32 >= collisionBox.getX() + collisionBox.getWidth()) && ((box.getY() <= collisionBox.getY() && box.getY() + 32 >= collisionBox.getY()) || (box.getY() <= collisionBox.getY() + collisionBox.getHeight() && box.getY() + 32 >= collisionBox.getY()  + collisionBox.getHeight()))) {
-//                connectedBox = box;
-//                return true;
-//            }
-//        }
-//        connectedBox = null;
-//        return false;
-//    }
-
+    public boolean playerOnRight(ArrayList<Player> players) {
+        for (Player player: players) {
+            if (player.isAvailable()) {
+                if (player != this && (player.getCollisionBox().getX() <= collisionBox.getX() + collisionBox.getWidth()) &&
+                        (player.getCollisionBox().getX() + player.getCollisionBox().getWidth() >= collisionBox.getX() + collisionBox.getWidth()) &&
+                        ((player.getCollisionBox().getY() < collisionBox.getY() && player.getCollisionBox().getY() + player.getCollisionBox().getHeight() > collisionBox.getY()) ||
+                                (player.getCollisionBox().getY() < collisionBox.getY() + collisionBox.getHeight() && player.getCollisionBox().getY() + player.getCollisionBox().getHeight() > collisionBox.getY() + collisionBox.getHeight()) ||
+                                (player.getCollisionBox().getY() <= collisionBox.getCenterY() && player.getCollisionBox().getY() + player.getCollisionBox().getHeight() >= collisionBox.getCenterY()))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
     public boolean reachEnd(Rectangle portal) {
         if (portal.contains(collisionBox.getCenterX(), collisionBox.getCenterY())) {
             left = false;
@@ -308,9 +336,7 @@ public class Player implements KeyListener{
         return false;
     }
 
-    public Box getConnectedBox() {
-        return connectedBox;
-    }
+
 
     public boolean isActive() {
         return active;
@@ -565,11 +591,8 @@ public class Player implements KeyListener{
         if (active) {
             int input = e.getKeyCode();
             switch (input) {
-                case KeyEvent.VK_UP:
-                    break;
                 case KeyEvent.VK_LEFT:
                     left = false;
-                    connectedBox = null;
                     if (!jumpAnimation) {
                         frameNumber = 0;
                     }
@@ -579,7 +602,6 @@ public class Player implements KeyListener{
                     break;
                 case KeyEvent.VK_RIGHT:
                     right = false;
-                    connectedBox = null;
                     if (!jumpAnimation) {
                         frameNumber = 0;
                     }

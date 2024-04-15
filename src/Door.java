@@ -4,8 +4,13 @@ public class Door {
     //When key is picked up the door stays open
     //When Button is pressed the Door opens, when you get off the door closes
 
-    public Door() {
+    private int number;
+    public Door(Engine engine, String doorNumber) {
+        number = Integer.parseInt(doorNumber.substring(1));
+    }
 
+    public int getNumber() {
+        return number;
     }
 
     public void update() {

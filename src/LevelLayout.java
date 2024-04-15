@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 import java.util.logging.Level;
 
@@ -20,6 +21,9 @@ public class LevelLayout {
     private boolean levelDone, swapped, resetting;
     private int characterInControl;
     private ArrayList<Box> boxes;
+    private HashMap<Opener, Door[]> openersAndDoors;
+    private ArrayList<Opener> openers;
+    private ArrayList<Door> doors;
 
     //Have like a list of all the characters that the player can control and when a character reaches the portal remove them from the list
 
@@ -32,6 +36,9 @@ public class LevelLayout {
         characterInControl = 0;
         swapped = false;
         boxes = new ArrayList<Box>();
+        openersAndDoors = new HashMap<Opener, Door[]>();
+        openers = new ArrayList<Opener>();
+        doors = new ArrayList<Door>();
         combined = new BufferedImage(1500, 900, BufferedImage.TYPE_INT_ARGB);
         setTileSet();
         setWalls();
@@ -127,8 +134,29 @@ public class LevelLayout {
                     case "b":
                         boxes.add(new Box(engine, c * 32 + 22, r * 32));
                         System.out.println(boxes);
+                        break;
+                }
+                if (levelData[r][c].contains("/")) {
+                    openers.add(new Key(engine, levelData[r][c]));
+                }
+                else if (levelData[r][c].contains("[")) {
+                    openers.add(new Button(engine, levelData[r][c]));
+                }
+                else if (levelData[r][c].contains("|")) {
+                    doors.add(new Door(engine, levelData[r][c]));
                 }
             }
+        }
+        for (Opener opener: openers) {
+            ArrayList<Door> subDoors = new ArrayList<Door>();
+            for (int i = 0; i < doors.size(); i++) {
+                if (doors.get(i).getNumber() == opener.getNumber()) {
+                    subDoors.add(doors.get(i));
+                    doors.remove(i);
+                    i--;
+                }
+            }
+            openersAndDoors.put(opener, (Door[]) subDoors.toArray());
         }
         System.out.println(walls.size());
         try {

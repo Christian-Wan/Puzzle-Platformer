@@ -12,10 +12,12 @@ public class Opener {
     private Rectangle collisionBox;
     private BufferedImage sprite;
     private Engine engine;
+    private int number;
 
-    public Opener(Engine engine) {
+    public Opener(Engine engine, String correspondingNumber) {
         this.engine = engine;
         opening = false;
+        number = Integer.parseInt(correspondingNumber.substring(1));
         //Collision box is set in child classes
         //sprite is set in the child classes
     }
@@ -66,5 +68,9 @@ public class Opener {
 
     public void setEngine(Engine engine) {
         this.engine = engine;
+    }
+
+    public int getNumber() {
+        return number;
     }
 }

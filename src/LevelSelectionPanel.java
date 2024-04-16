@@ -26,6 +26,7 @@ public class LevelSelectionPanel extends JPanel implements MouseListener {
         levels[0][2] = new Rectangle(250, 150, 50, 50);
         levels[0][3] = new Rectangle(350, 150, 50, 50);
         levels[0][4] = new Rectangle(450, 150, 50, 50);
+        levels[1][0] = new Rectangle(50, 250, 50, 50);
     }
     public void update() {
         engine.getTransitions().update();
@@ -61,6 +62,7 @@ public class LevelSelectionPanel extends JPanel implements MouseListener {
 
                     if (levels[r][c] != null) {
                         if (levels[r][c].contains(clicked)) {
+                            //Row * 5  + Column + 1
                             engine.newLevelLayout(r * 5 + c + 1);
                             engine.getTransitions().setDesiredLocation("Play");
                             engine.getTransitions().setIn(true);

@@ -81,7 +81,6 @@ public class Player implements KeyListener{
             available = false;
             engine.getLevelLayout().checkLevelDone();
             engine.getLevelLayout().changeActive();
-            System.out.println("ASDKH");
         }
 
         //if touching platform send player to top of the platform

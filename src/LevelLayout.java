@@ -72,7 +72,7 @@ public class LevelLayout {
         Graphics g = combined.getGraphics();
         walls = new ArrayList<Rectangle>();
         //make sure to put the things that won't be counted as walls here
-        String nonWallTiles = "pzekb/[|";
+        String nonWallTiles = "pzekb/[|n";
         for (int r = 0; r < 27; r++) {
             for (int c = 0; c < 47; c++) {
                 if (!nonWallTiles.contains(levelData[r][c]) && !levelData[r][c].contains("[") && !levelData[r][c].contains("/") && !levelData[r][c].contains("|")) {
@@ -120,7 +120,7 @@ public class LevelLayout {
                         g.drawImage(bottomRightDarkness, c * 32, r * 32, 32, 32, null);
                         break;
                     case "p":
-                        engine.newWizard(c * 32 + 14, r * 32);
+                        engine.newWizard(c * 32 + 14, r * 32 + 20);
                         availableCharacters.add(engine.getWizard());
                         break;
                     case "e":
@@ -128,12 +128,16 @@ public class LevelLayout {
                         engine.getPortal().setY(r * 32 - 5);
                         break;
                     case "k":
-                        engine.newKnight(c * 32 + 14, r * 32);
+                        engine.newKnight(c * 32 + 14, r * 32 + 20);
                         availableCharacters.add(engine.getKnight());
                         break;
                     case "b":
                         boxes.add(new Box(engine, c * 32 + 22, r * 32));
                         System.out.println(boxes);
+                        break;
+                    case "n":
+                        engine.newNecromancer(c * 32 + 14, r * 32 + 20);
+                        availableCharacters.add(engine.getNecromancer());
                         break;
                 }
                 if (levelData[r][c].contains("/")) {
@@ -184,7 +188,7 @@ public class LevelLayout {
     public void resetStage() {
         boxes.clear();
         int counter = 0;
-        String characters = "pk";
+        String characters = "pkn";
         for (int r = 0; r < 27; r++) {
             for (int c = 0; c < 47; c++) {
                 if (characters.contains(levelData[r][c])) {

@@ -2,6 +2,7 @@ public class Engine {
     private Player player;
     private Wizard wizard;
     private Knight knight;
+    private Necromancer necromancer;
     private Portal portal;
     private LevelLayout levelLayout;
     private PlayBackground playBackground;
@@ -44,6 +45,16 @@ public class Engine {
     public void newKnight(int x, int y) {
         knight = new Knight(this, x, y);
         playPanel.addKeyListener(knight);
+    }
+
+    public void newNecromancer(int x, int y) {
+        necromancer = new Necromancer(this, x, y);
+        playPanel.addKeyListener(necromancer);
+    }
+
+
+    public Necromancer getNecromancer() {
+        return necromancer;
     }
 
     public Player getPlayer() {

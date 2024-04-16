@@ -85,7 +85,7 @@ public class Player implements KeyListener{
         }
 
         //if touching platform send player to top of the platform
-        if (touchingPlatform(engine.getLevelLayout().getWalls()) || touchingBox(engine.getLevelLayout().getBoxes()) || onPlayer(engine.getLevelLayout().getAvailableCharacters())) {
+        if (touchingPlatform(engine.getLevelLayout().getWalls()) || touchingBox(engine.getLevelLayout().getBoxes()) || onPlayer(engine.getLevelLayout().getAvailableCharacters()) || onTopOfDoor(engine.getLevelLayout().getDoors())) {
             if (inAir) {
                 y = (int) (onCollisionBox.getY() - collisionBox.getHeight());
                 velocity = 4;
@@ -96,14 +96,14 @@ public class Player implements KeyListener{
             inAir = true;
         }
 
-        if (right && !wallOnRight(engine.getLevelLayout().getWalls()) && !boxOnRight(engine.getLevelLayout().getBoxes()) && !playerOnRight(engine.getLevelLayout().getAvailableCharacters())) {
+        if (right && !wallOnRight(engine.getLevelLayout().getWalls()) && !boxOnRight(engine.getLevelLayout().getBoxes()) && !playerOnRight(engine.getLevelLayout().getAvailableCharacters()) && !doorOnRight(engine.getLevelLayout().getDoors())) {
             x += 2;
         }
-        else if (left && !wallOnLeft(engine.getLevelLayout().getWalls()) && !boxOnLeft(engine.getLevelLayout().getBoxes()) && !playerOnLeft(engine.getLevelLayout().getAvailableCharacters())) {
+        else if (left && !wallOnLeft(engine.getLevelLayout().getWalls()) && !boxOnLeft(engine.getLevelLayout().getBoxes()) && !playerOnLeft(engine.getLevelLayout().getAvailableCharacters()) && !doorOnLeft(engine.getLevelLayout().getDoors())) {
             x -= 2;
         }
 
-        if (touchingCeiling(engine.getLevelLayout().getWalls()) || boxOnTop(engine.getLevelLayout().getBoxes()) || playerOnTop(engine.getLevelLayout().getAvailableCharacters())) {
+        if (touchingCeiling(engine.getLevelLayout().getWalls()) || boxOnTop(engine.getLevelLayout().getBoxes()) || playerOnTop(engine.getLevelLayout().getAvailableCharacters()) || touchingBottomOfDoor(engine.getLevelLayout().getDoors())) {
             up = false;
             velocity = 3;
             velocityTimer = 0;
@@ -189,6 +189,7 @@ public class Player implements KeyListener{
             image = standL.getSubimage(24 + (64 * (frameNumber / 3)), 21, 15, 23);
         }
         g.drawImage(image, x, y, 15 * SCALE, 23 * SCALE, null);
+        g.setColor(Color.BLUE);
         g.drawRect(collisionBox.x, collisionBox.y, collisionBox.width, collisionBox.height);
     }
 
@@ -229,6 +230,45 @@ public class Player implements KeyListener{
     public boolean wallOnRight(ArrayList<Rectangle> rectangles) {
         for (Rectangle rect: rectangles) {
             if ((rect.getX() <= collisionBox.getX() + collisionBox.getWidth()) && (rect.getX() + rect.getWidth() >= collisionBox.getX() + collisionBox.getWidth()) && ((rect.getY() < collisionBox.getY() && rect.getY() + rect.getHeight() > collisionBox.getY()) || (rect.getY() < collisionBox.getY() + collisionBox.getHeight() && rect.getY() + rect.getHeight() > collisionBox.getY() + collisionBox.getHeight()) || (rect.getY() < collisionBox.getCenterY() && rect.getY() + rect.getHeight() > collisionBox.getCenterY()))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean onTopOfDoor(ArrayList<Door> doors) {
+        for (Door door: doors) {
+            if ((door.getCollisionBox().getY() + door.getCollisionBox().getHeight() >= collisionBox.getY() + collisionBox.getHeight()) && (door.getCollisionBox().getY() <= collisionBox.getY() + collisionBox.getHeight()) && ((door.getCollisionBox().getX() < collisionBox.getX() && door.getCollisionBox().getX() + door.getCollisionBox().getWidth() > collisionBox.getX()) || (door.getCollisionBox().getX() < collisionBox.getX() + collisionBox.getWidth() && door.getCollisionBox().getX() + door.getCollisionBox().getWidth() > collisionBox.getX() + collisionBox.getWidth()))) {
+                onCollisionBox = door.getCollisionBox();
+                return true;
+            }
+        }
+        return false;
+    }
+    public boolean touchingBottomOfDoor(ArrayList<Door> doors) {
+        for (Door door: doors) {
+            if (door.getCollisionBox().getY() + door.getCollisionBox().getHeight() >= collisionBox.getY() && door.getCollisionBox().getY() <= collisionBox.getY() && ((door.getCollisionBox().getX() < collisionBox.getX() && door.getCollisionBox().getX() + door.getCollisionBox().getWidth() > collisionBox.getX()) || (door.getCollisionBox().getX() < collisionBox.getX() + collisionBox.getWidth() && door.getCollisionBox().getX() + door.getCollisionBox().getWidth() > collisionBox.getX() + collisionBox.getWidth()))) {
+                if (inAir) {
+                    y = (int) (door.getCollisionBox().getY() + door.getCollisionBox().getHeight() + 1);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+    public boolean doorOnLeft(ArrayList<Door> doors) {
+        for (Door door: doors) {
+            if ((door.getCollisionBox().getX() + door.getCollisionBox().getWidth() >= collisionBox.getX()) && (door.getCollisionBox().getX() <= collisionBox.getX()) && ((door.getCollisionBox().getY() < collisionBox.getY() && door.getCollisionBox().getY() + door.getCollisionBox().getHeight() > collisionBox.getY()) || (door.getCollisionBox().getY() < (collisionBox.getY() + collisionBox.getHeight()) && door.getCollisionBox().getY() + door.getCollisionBox().getHeight() > collisionBox.getY() + collisionBox.getHeight()) || (door.getCollisionBox().getY() < collisionBox.getCenterY() && door.getCollisionBox().getY() + door.getCollisionBox().getHeight() > collisionBox.getCenterY()))) {
+                return true;
+            }
+        }
+        //first two statements determine if the player has clipped into the wall. The next one determines if the player is on the same y level as the wall
+        return false;
+    }
+
+    public boolean doorOnRight(ArrayList<Door> doors) {
+        for (Door door: doors) {
+            if ((door.getCollisionBox().getX() <= collisionBox.getX() + collisionBox.getWidth()) && (door.getCollisionBox().getX() + door.getCollisionBox().getWidth() >= collisionBox.getX() + collisionBox.getWidth()) && ((door.getCollisionBox().getY() < collisionBox.getY() && door.getCollisionBox().getY() + door.getCollisionBox().getHeight() > collisionBox.getY()) || (door.getCollisionBox().getY() < collisionBox.getY() + collisionBox.getHeight() && door.getCollisionBox().getY() + door.getCollisionBox().getHeight() > collisionBox.getY() + collisionBox.getHeight()) || (door.getCollisionBox().getY() < collisionBox.getCenterY() && door.getCollisionBox().getY() + door.getCollisionBox().getHeight() > collisionBox.getCenterY()))) {
                 return true;
             }
         }

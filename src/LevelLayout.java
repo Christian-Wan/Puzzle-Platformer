@@ -72,10 +72,10 @@ public class LevelLayout {
         Graphics g = combined.getGraphics();
         walls = new ArrayList<Rectangle>();
         //make sure to put the things that won't be counted as walls here
-        String nonWallTiles = "pzekb";
+        String nonWallTiles = "pzekb/[|";
         for (int r = 0; r < 27; r++) {
             for (int c = 0; c < 47; c++) {
-                if (!nonWallTiles.contains(levelData[r][c])) {
+                if (!nonWallTiles.contains(levelData[r][c]) && !levelData[r][c].contains("[") && !levelData[r][c].contains("/") && !levelData[r][c].contains("|")) {
                     //make sure that this has the right values
                     walls.add(new Rectangle(c * 32, r * 32, 32, 32));
                 }
@@ -137,13 +137,13 @@ public class LevelLayout {
                         break;
                 }
                 if (levelData[r][c].contains("/")) {
-                    openers.add(new Key(engine, levelData[r][c]));
+                    openers.add(new Key(engine, levelData[r][c], c * 32 + 8, r * 32 + 9));
                 }
                 else if (levelData[r][c].contains("[")) {
-                    openers.add(new Button(engine, levelData[r][c]));
+                    openers.add(new Button(engine, levelData[r][c], c * 32 + 8, r * 32 + 24));
                 }
                 else if (levelData[r][c].contains("|")) {
-                    doors.add(new Door(engine, levelData[r][c]));
+                    doors.add(new Door(engine, levelData[r][c],c * 32, r * 32));
                 }
             }
         }
@@ -152,11 +152,10 @@ public class LevelLayout {
             for (int i = 0; i < doors.size(); i++) {
                 if (doors.get(i).getNumber() == opener.getNumber()) {
                     subDoors.add(doors.get(i));
-                    doors.remove(i);
-                    i--;
                 }
             }
-            openersAndDoors.put(opener, (Door[]) subDoors.toArray());
+            Door[] doorArray = subDoors.toArray(new Door[subDoors.size()]);
+            openersAndDoors.put(opener, doorArray);
         }
         System.out.println(walls.size());
         try {
@@ -197,6 +196,12 @@ public class LevelLayout {
                 }
                 else if (levelData[r][c].equals("b")) {
                     boxes.add(new Box(engine, c * 32 + 22, r * 32));
+                }
+                for (Opener opener: openers) {
+                    opener.setOpening(false);
+                }
+                for (Door door: doors) {
+                    door.setKeyOpen(false);
                 }
             }
         }
@@ -240,15 +245,27 @@ public class LevelLayout {
         for (int i = 0; i < walls.size(); i++) {
             g.drawRect((int) walls.get(i).getX(), (int) walls.get(i).getY(), (int) walls.get(i).getWidth(), (int) walls.get(i).getHeight());
         }
+        //Draws all boxes
         for (Box box: boxes) {
             box.draw(g);
         }
-        engine.getPortal().draw(g);
+        //Draws all keys/buttons
+        for (Opener opener: openers) {
+            opener.draw(g);
+        }
+        //Draws all doors
+        for (Door door: doors) {
+            door.draw(g);
+        }
+        engine.getPortal().draw(g); //Draws the end portal
+        //Draws all players that haven't entered the portal yet
         for (Player character: availableCharacters) {
             if (character.isAvailable()) {
                 character.draw(g);
             }
         }
+
+
 //        System.out.println("QWE");
     }
 
@@ -266,6 +283,12 @@ public class LevelLayout {
             if (resetting) {
                 resetStage();
                 resetting = false;
+            }
+            for (Opener opener: openers) {
+                opener.update();
+            }
+            for (Door door: doors) {
+                door.update();
             }
             engine.getPortal().update();
 //        System.out.println("LKJ");
@@ -287,5 +310,13 @@ public class LevelLayout {
 
     public ArrayList<Box> getBoxes() {
         return boxes;
+    }
+
+    public HashMap<Opener, Door[]> getOpenersAndDoors() {
+        return openersAndDoors;
+    }
+
+    public ArrayList<Door> getDoors() {
+        return doors;
     }
 }

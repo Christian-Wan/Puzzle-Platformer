@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.awt.event.KeyEvent;
 
 public class Necromancer extends Player {
 
@@ -10,13 +11,13 @@ public class Necromancer extends Player {
     public void doAbility() {
         if (super.isFacingRight()) {
             try {
-                summon = new Skeleton(super.getEngine(), (int) (super.getCollisionBox().getX() + super.getCollisionBox().getWidth() + 1), super.getY(), super.isRight(), super.isLeft(), super.isUp());
+                summon = new Skeleton(super.getEngine(), (int) (super.getCollisionBox().getX() + super.getCollisionBox().getWidth() + 4), super.getY(), super.isRight(), super.isLeft(), super.isUp());
 
             } catch (InWallException e) {}
         }
         else {
             try {
-                summon = new Skeleton(super.getEngine(), (int) (super.getCollisionBox().getX() - super.getCollisionBox().getWidth() - 3), super.getY(), super.isRight(), super.isLeft(), super.isUp());
+                summon = new Skeleton(super.getEngine(), (int) (super.getCollisionBox().getX() - super.getCollisionBox().getWidth() - 6), super.getY(), super.isRight(), super.isLeft(), super.isUp());
             } catch (InWallException e) {}
         }
     }
@@ -32,5 +33,16 @@ public class Necromancer extends Player {
         if (summon != null) {
             summon.draw(g);
         }
+    }
+
+    public void keyPressed(KeyEvent e) {
+        super.keyPressed(e);
+        if (e.getKeyCode() == KeyEvent.VK_R) {
+            summon = null;
+        }
+    }
+
+    public Skeleton getSummon() {
+        return summon;
     }
 }

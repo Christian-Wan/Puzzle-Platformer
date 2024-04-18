@@ -376,6 +376,29 @@ public class Player implements KeyListener{
     }
 
 
+    public int getVelocity() {
+        return velocity;
+    }
+
+    public void setVelocity(int velocity) {
+        this.velocity = velocity;
+    }
+
+    public int getVelocityTimer() {
+        return velocityTimer;
+    }
+
+    public void setVelocityTimer(int velocityTimer) {
+        this.velocityTimer = velocityTimer;
+    }
+
+    public void setOnCollisionBox(Rectangle onCollisionBox) {
+        this.onCollisionBox = onCollisionBox;
+    }
+
+    public Rectangle getOnCollisionBox() {
+        return onCollisionBox;
+    }
 
     public boolean isActive() {
         return active;
@@ -576,7 +599,6 @@ public class Player implements KeyListener{
                 case KeyEvent.VK_UP:
                     if (!up && !inAir) {
                         frameNumber = 0;
-                        System.out.println(y);
                         up = true;
                         jumpAnimation = true;
                         velocity = -3;

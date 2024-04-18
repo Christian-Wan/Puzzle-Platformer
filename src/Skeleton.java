@@ -3,6 +3,7 @@ import java.awt.event.KeyEvent;
 
 public class Skeleton extends Player {
 
+    private boolean jumping;
     public Skeleton(Engine engine, int x, int y, boolean isRight, boolean isLeft, boolean isJump) throws InWallException {
         super(engine, x, y);
         if (inAnything()) {
@@ -10,7 +11,7 @@ public class Skeleton extends Player {
         }
         super.setRight(isRight);
         super.setLeft(isLeft);
-        super.setUp(isJump);
+        jumping = isJump;
         if (isRight) {
             super.setFacingLeft(false);
             super.setFacingRight(true);
@@ -18,6 +19,19 @@ public class Skeleton extends Player {
         else if (isLeft) {
             super.setFacingRight(false);
             super.setFacingLeft(true);
+        }
+
+    }
+
+    @Override
+    public void update() {
+        super.update();
+        if (jumping && !super.isInAir()) {
+            super.setFrameNumber(0);
+            super.setUp(true);
+            super.setJumpAnimation(true);
+            super.setVelocity(-3);
+            super.setVelocityTimer(0);
         }
     }
 

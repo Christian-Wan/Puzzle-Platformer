@@ -79,10 +79,34 @@ public class Box {
         }
         return false;
     }
+
+    public boolean skeletonBelow(Skeleton skeleton) {
+        if ((skeleton.getY() + skeleton.getCollisionBox().height >= collisionBox.getY() + collisionBox.getHeight()) && (skeleton.getY() <= collisionBox.getY() + collisionBox.getHeight()) && ((skeleton.getCollisionBox().getX() < collisionBox.getX() && skeleton.getCollisionBox().getX() + skeleton.getCollisionBox().getWidth() > collisionBox.getX()) || (skeleton.getCollisionBox().getX() < collisionBox.getX() + collisionBox.getWidth() && skeleton.getCollisionBox().getX() + skeleton.getCollisionBox().getWidth() > collisionBox.getX() + collisionBox.getWidth()) || (collisionBox.getX() < skeleton.getCollisionBox().getCenterX() && collisionBox.getX() + 32 > skeleton.getCollisionBox().getCenterX()))) {
+            onCollisionBox = skeleton.getCollisionBox();
+            return true;
+        }
+        return false;
+    }
+
+    public boolean skeletonOnLeft(Skeleton skeleton, int x) {
+        if ((skeleton.getX() + skeleton.getCollisionBox().width >= x) && (skeleton.getX() <= x) && ((skeleton.getY() < collisionBox.getY() && skeleton.getY() + skeleton.getCollisionBox().height > collisionBox.getY()) || (skeleton.getY() < (collisionBox.getY() + collisionBox.getHeight()) && skeleton.getY() + skeleton.getCollisionBox().height > collisionBox.getY()  + collisionBox.getHeight()))) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean skeletonOnRight(Skeleton skeleton, int x) {
+        if ((skeleton.getCollisionBox().x + engine.getSCALE() <= x + collisionBox.getWidth()) && (skeleton.getCollisionBox().x + engine.getSCALE() + skeleton.getCollisionBox().width >= x + collisionBox.getWidth()) && ((skeleton.getY() < collisionBox.getY() && skeleton.getY() + skeleton.getCollisionBox().height > collisionBox.getY()) || (skeleton.getY() < collisionBox.getY() + collisionBox.getHeight() && skeleton.getY() + skeleton.getCollisionBox().height > collisionBox.getY()  + collisionBox.getHeight()))) {
+            return true;
+        }
+        return false;
+    }
     public void checkChangeX(int change) {
         if (change > 0) {
             if (!wallOnRight(engine.getLevelLayout().getWalls(), x + change) && !playerOnRight(engine.getLevelLayout().getAvailableCharacters(), x + change)) {
-                x += change;
+                if (engine.getNecromancer() != null || !skeletonOnRight(engine.getNecromancer().getSummon(), x + change)) {
+                    x += change;
+                }
             }
         }
         if (change < 0) {
@@ -92,7 +116,7 @@ public class Box {
         }
     }
     public void update() {
-        if (!touchingPlatform(engine.getLevelLayout().getWalls()) && !playerBelow(engine.getLevelLayout().getAvailableCharacters())) {
+        if (!touchingPlatform(engine.getLevelLayout().getWalls()) && !playerBelow(engine.getLevelLayout().getAvailableCharacters()) && !skeletonBelow(engine.getNecromancer().getSummon())) {
             y += velocity;
             inAir = true;
             velocityTimer++;

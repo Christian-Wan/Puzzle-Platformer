@@ -15,6 +15,6 @@ public class PlayBackground {
     }
 
     public void draw(Graphics2D g) {
-        g.drawImage(background1, 0, 0, 1400, 900, null);
+        g.drawImage(background1, 0, 0, 1500, 900, null);
     }
 }

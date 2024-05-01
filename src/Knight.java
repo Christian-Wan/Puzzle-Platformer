@@ -19,6 +19,10 @@ public class Knight extends Player {
         try {
             super.setStandR(ImageIO.read(new File("image/Knight/Knight_StandR.png")));
             super.setStandL(ImageIO.read(new File("image/Knight/Knight_StandL.png")));
+            super.setRisingR(ImageIO.read(new File("image/Knight/Knight_RisingR.png")));
+            super.setRisingL(ImageIO.read(new File("image/Knight/Knight_RisingL.png")));
+            super.setFallingR(ImageIO.read(new File("image/Knight/Knight_FallingR.png")));
+            super.setFallingL(ImageIO.read(new File("image/Knight/Knight_FallingL.png")));
             super.setWalkR(ImageIO.read(new File("image/Knight/Knight_WalkR.png")));
             super.setWalkL(ImageIO.read(new File("image/Knight/Knight_WalkL.png")));
         } catch (IOException e) {}
@@ -81,13 +85,13 @@ public class Knight extends Player {
     public void keyPressed(KeyEvent e) {
         if (usingAbility) {
             if (e.getKeyCode() == KeyEvent.VK_LEFT && super.isFacingRight()) {
-                if (!super.isLeft() && !super.isJumpAnimation()) {
+                if (!super.isLeft() && !super.isInAir()) {
                     setFrameNumber(0);
                 }
                 super.setLeft(true);
             }
             else if (e.getKeyCode() == KeyEvent.VK_RIGHT && super.isFacingLeft()) {
-                if (!super.isRight() && !super.isJumpAnimation()) {
+                if (!super.isRight() && !super.isInAir()) {
                     setFrameNumber(0);
                 }
                 super.setRight(true);

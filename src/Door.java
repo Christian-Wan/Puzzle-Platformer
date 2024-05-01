@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public class Door {
     //Is going to be the value in the Hashmap
@@ -10,6 +11,7 @@ public class Door {
     private int number;
     private boolean buttonOpen, keyOpen;
     private Rectangle collisionBox;
+    private BufferedImage door;
     public Door(Engine engine, String doorNumber, int x , int y) {
         this.engine = engine;
         number = Integer.parseInt(doorNumber.substring(1));

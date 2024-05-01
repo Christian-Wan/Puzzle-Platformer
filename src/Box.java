@@ -33,19 +33,18 @@ public class Box {
         }
         return false;
     }
-    public boolean wallOnLeft(ArrayList<Rectangle> rectangles, int x) {
-        for (Rectangle rect: rectangles) {
-            if ((rect.getX() + rect.getWidth() > x) && (rect.getX() < x) && ((rect.getY() < collisionBox.getY() && rect.getY() + rect.getHeight() > collisionBox.getY()) || (rect.getY() < (collisionBox.getY() + collisionBox.getHeight()) && rect.getY() + rect.getHeight() > collisionBox.getY()  + collisionBox.getHeight()))) {
+    public boolean wallOnLeft(ArrayList<Rectangle> walls, int x) {
+        for (Rectangle rect: walls) {
+            if ((rect.getX() + rect.width > x) && (rect.getX() <= x) && ((rect.getY() < collisionBox.getY() && rect.getY() + rect.height > collisionBox.getY()) || (rect.getY() < (collisionBox.getY() + collisionBox.getHeight()) && rect.getY() + rect.height > collisionBox.getY()  + collisionBox.getHeight()) || (rect.getY() < collisionBox.getCenterY() && rect.getY() + rect.getHeight() > collisionBox.getCenterY()))) {
                 return true;
             }
         }
-        //first two statements determine if the player has clipped into the wall. The next one determines if the player is on the same y level as the wall
         return false;
     }
 
     public boolean wallOnRight(ArrayList<Rectangle> rectangles, int x) {
         for (Rectangle rect: rectangles) {
-            if ((rect.getX() < x + collisionBox.getWidth()) && (rect.getX() + rect.getWidth() > x + collisionBox.getWidth()) && ((rect.getY() < collisionBox.getY() && rect.getY() + rect.getHeight() > collisionBox.getY()) || (rect.getY() < collisionBox.getY() + collisionBox.getHeight() && rect.getY() + rect.getHeight() > collisionBox.getY()  + collisionBox.getHeight()) || (rect.getY() < collisionBox.getCenterY() && rect.getY() + rect.getHeight() > collisionBox.getCenterY()))) {
+            if ((rect.getX() <= x + collisionBox.getWidth()) && (rect.getX() + rect.getWidth() >= x + collisionBox.getWidth()) && ((rect.getY() < collisionBox.getY() && rect.getY() + rect.getHeight() > collisionBox.getY()) || (rect.getY() < collisionBox.getY() + collisionBox.getHeight() && rect.getY() + rect.getHeight() > collisionBox.getY()  + collisionBox.getHeight()) || (rect.getY() < collisionBox.getCenterY() && rect.getY() + rect.getHeight() > collisionBox.getCenterY()))) {
                 return true;
             }
         }
@@ -67,7 +66,6 @@ public class Box {
                 return true;
             }
         }
-        //first two statements determine if the player has clipped into the wall. The next one determines if the player is on the same y level as the wall
         return false;
     }
 
@@ -104,14 +102,26 @@ public class Box {
     public void checkChangeX(int change) {
         if (change > 0) {
             if (!wallOnRight(engine.getLevelLayout().getWalls(), x + change) && !playerOnRight(engine.getLevelLayout().getAvailableCharacters(), x + change)) {
-                if (engine.getNecromancer() != null || !skeletonOnRight(engine.getNecromancer().getSummon(), x + change)) {
+                if (engine.getNecromancer() != null && engine.getNecromancer().getSummon() != null) {
+                    if (!skeletonOnRight(engine.getNecromancer().getSummon(), x + change)) {
+                        x += change;
+                    }
+                }
+                else {
                     x += change;
                 }
             }
         }
         if (change < 0) {
             if (!wallOnLeft(engine.getLevelLayout().getWalls(), x + change) && !playerOnLeft(engine.getLevelLayout().getAvailableCharacters(), x + change)) {
-                x += change;
+                if (engine.getNecromancer() != null && engine.getNecromancer().getSummon() != null) {
+                    if (!skeletonOnLeft(engine.getNecromancer().getSummon(), x + change)) {
+                        x += change;
+                    }
+                }
+                else {
+                    x += change;
+                }
             }
         }
     }

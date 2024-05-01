@@ -1,17 +1,32 @@
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 public class Key extends Opener {
     //Is floating like the portal
     //Can only be obtained by player and maybe necromancer minion
     //Is key in Hashmap
 
+    private BufferedImage image;
+    private int timer;
+
     public Key(Engine engine, String keyNumber, int x, int y) {
         super(engine, keyNumber);
-        super.setCollisionBox(new Rectangle(x, y, 16, 10));
+        timer = 0;
+        super.setCollisionBox(new Rectangle(x, y, 28, 12));
         //if there are multiple keys they have to be different colours so that the player knows which doors they open
         switch(super.getNumber()) {
             case 1:
-                //set the sprite here
+                try {
+                    image = ImageIO.read(new File("image/Level_Assets/Key_Red.png")).getSubimage(26, 29, 14, 6);
+                } catch (IOException e) {}
+                break;
+            case 2:
+                try {
+                    image = ImageIO.read(new File("image/Level_Assets/Key_Blue.png")).getSubimage(26, 29, 14, 6);
+                } catch (IOException e) {}
                 break;
         }
     }
@@ -26,12 +41,21 @@ public class Key extends Opener {
                 }
             }
         }
+
+        timer++;
+        if (timer == 30) {
+            super.getCollisionBox().setLocation((int) super.getCollisionBox().getX(), (int) super.getCollisionBox().getY() - 5);
+        }
+        else if (timer == 60) {
+            super.getCollisionBox().setLocation((int) super.getCollisionBox().getX(), (int) super.getCollisionBox().getY() + 5);
+            timer = 0;
+        }
+
     }
 
     public void draw(Graphics2D g) {
-        g.setColor(Color.RED);
         if (!super.isOpening()) {
-            g.drawRect(super.getCollisionBox().x, super.getCollisionBox().y, super.getCollisionBox().width, super.getCollisionBox().height);
+            g.drawImage(image, (int) super.getCollisionBox().getX(), (int) super.getCollisionBox().getY(), 28, 12, null);
         }
     }
 }

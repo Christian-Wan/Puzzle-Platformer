@@ -11,11 +11,11 @@ import java.util.ArrayList;
 //IMPORTANT: MAKE SEPARATE ANIMATIONS FOR PLAYER MOVING UP, MOVING DOWN, AND LANDING
 public class Player implements KeyListener{
 
-    private BufferedImage walkR, jumpR, standR, walkL, jumpL, standL;
+    private BufferedImage walkR, standR, walkL, standL, risingR, risingL, fallingR, fallingL;
     private Engine engine;
-    private int x, y, frameNumber, framesPassed, velocity, velocityTimer;
+    private int x, y, frameNumber, framesPassed, velocity, velocityTimer, timeInAir;
     final private int SCALE = 2;
-    private boolean up, down, left, right, facingRight, facingLeft, jumpAnimation, inAir, available, active;
+    private boolean up, down, left, right, facingRight, facingLeft, inAir, available, active;
     private Rectangle collisionBox, onCollisionBox;
     //3 child classes that will be the mage knight and ?
     public Player(Engine engine) {
@@ -31,12 +31,15 @@ public class Player implements KeyListener{
         facingLeft = false;
         facingRight = true;
         inAir = false;
+        timeInAir = 0;
         collisionBox = new Rectangle(x + SCALE, y, 14 * SCALE, 22 * SCALE);
         try {
             walkR = ImageIO.read(new File("image/Mage/Mage_WalkR.png"));
             walkL = ImageIO.read(new File("image/Mage/Mage_WalkL.png"));
-            jumpR = ImageIO.read(new File("image/Mage/Mage_JumpR.png"));
-            jumpL = ImageIO.read(new File("image/Mage/Mage_JumpL.png"));
+            risingR = ImageIO.read(new File("image/Mage/Mage_RisingR.png"));
+            fallingR = ImageIO.read(new File("image/Mage/Mage_FallingR.png"));
+            risingL = ImageIO.read(new File("image/Mage/Mage_RisingL.png"));
+            fallingL = ImageIO.read(new File("image/Mage/Mage_FallingL.png"));
             standR = ImageIO.read(new File("image/Mage/Mage_StandR.png"));
             standL = ImageIO.read(new File("image/Mage/Mage_StandL.png"));
         } catch (IOException e) {}
@@ -58,12 +61,15 @@ public class Player implements KeyListener{
         inAir = false;
         available = true;
         active = false;
+        timeInAir = 0;
         collisionBox = new Rectangle(x + SCALE, y, 14 * SCALE, 22 * SCALE);
         try {
             walkR = ImageIO.read(new File("image/Mage/Mage_WalkR.png"));
             walkL = ImageIO.read(new File("image/Mage/Mage_WalkL.png"));
-            jumpR = ImageIO.read(new File("image/Mage/Mage_JumpR.png"));
-            jumpL = ImageIO.read(new File("image/Mage/Mage_JumpL.png"));
+            risingR = ImageIO.read(new File("image/Mage/Mage_RisingR.png"));
+            fallingR = ImageIO.read(new File("image/Mage/Mage_FallingR.png"));
+            risingL = ImageIO.read(new File("image/Mage/Mage_RisingL.png"));
+            fallingL = ImageIO.read(new File("image/Mage/Mage_FallingL.png"));
             standR = ImageIO.read(new File("image/Mage/Mage_StandR.png"));
             standL = ImageIO.read(new File("image/Mage/Mage_StandL.png"));
         } catch (IOException e) {}
@@ -83,6 +89,13 @@ public class Player implements KeyListener{
             engine.getLevelLayout().changeActive();
         }
 
+        //causes the player to fall after a while
+        if (timeInAir == 6) {
+            up = false;
+            velocity = 4;
+            velocityTimer = 0;
+        }
+
         //if touching platform send player to top of the platform
         if (touchingPlatform(engine.getLevelLayout().getWalls()) || touchingBox(engine.getLevelLayout().getBoxes()) || onPlayer(engine.getLevelLayout().getAvailableCharacters()) || onTopOfDoor(engine.getLevelLayout().getDoors())) {
             if (inAir) {
@@ -91,20 +104,45 @@ public class Player implements KeyListener{
             }
             inAir = false;
         }
+        else if (engine.getNecromancer() != null && engine.getNecromancer().getSummon() != null && skeletonBelow(engine.getNecromancer().getSummon())) {
+            if (inAir) {
+                y = (int) (onCollisionBox.getY() - collisionBox.getHeight());
+                velocity = 4;
+                System.out.println("Touch");
+            }
+            inAir = false;
+
+        }
         else {
             inAir = true;
+            frameNumber = 0;
         }
 
         if (right && !wallOnRight(engine.getLevelLayout().getWalls()) && !boxOnRight(engine.getLevelLayout().getBoxes()) && !playerOnRight(engine.getLevelLayout().getAvailableCharacters()) && !doorOnRight(engine.getLevelLayout().getDoors())) {
-            x += 2;
+            if (engine.getNecromancer() == null || engine.getNecromancer().getSummon() == null) {
+                x += 2;
+            }
+            else if (!skeletonOnRight(engine.getNecromancer().getSummon())){
+                x += 2;
+            }
         }
         else if (left && !wallOnLeft(engine.getLevelLayout().getWalls()) && !boxOnLeft(engine.getLevelLayout().getBoxes()) && !playerOnLeft(engine.getLevelLayout().getAvailableCharacters()) && !doorOnLeft(engine.getLevelLayout().getDoors())) {
-            x -= 2;
+            if (engine.getNecromancer() == null || engine.getNecromancer().getSummon() == null) {
+                x -= 2;
+            }
+            else if (!skeletonOnLeft(engine.getNecromancer().getSummon())){
+                x -= 2;
+            }
         }
 
         if (touchingCeiling(engine.getLevelLayout().getWalls()) || boxOnTop(engine.getLevelLayout().getBoxes()) || playerOnTop(engine.getLevelLayout().getAvailableCharacters()) || touchingBottomOfDoor(engine.getLevelLayout().getDoors())) {
             up = false;
-            velocity = 3;
+            velocity = 4;
+            velocityTimer = 0;
+        }
+        else if (engine.getNecromancer() != null && engine.getNecromancer().getSummon() != null && skeletonOnTop(engine.getNecromancer().getSummon())) {
+            up = false;
+            velocity = 4;
             velocityTimer = 0;
         }
         else if (!up && inAir) {
@@ -113,7 +151,7 @@ public class Player implements KeyListener{
         else if (up) {
             y += velocity;
         }
-        if (velocityTimer % 18 == 0 && inAir) {
+        if (velocityTimer % 20 == 0 && inAir) {
             if (velocity != 7 && velocity > 0) {
                 velocity++;
             }
@@ -125,18 +163,13 @@ public class Player implements KeyListener{
 
         //Animations
         if (framesPassed == 6) {
-            if (jumpAnimation) {
-                if (frameNumber != 10) {
+            if (inAir) {
+                timeInAir++;
+                if (frameNumber != 1) {
                     frameNumber++;
-                    if (frameNumber == 6) {
-                        up = false;
-                        velocity = 3;
-                        velocityTimer = 0;
-                    }
                 }
                 else {
                     frameNumber = 0;
-                    jumpAnimation = false;
                 }
             }
             else if (right) {
@@ -167,11 +200,21 @@ public class Player implements KeyListener{
     //the standing left animation is wrong and the jumping animation is a little messed up
     public void draw(Graphics2D g) {
         BufferedImage image = null;
-        if (jumpAnimation && facingRight) {
-            image = jumpR.getSubimage(1 + (64 * frameNumber), 25, 15, 23);
+        if (inAir && velocity > 0) {
+            if (facingRight) {
+                image = fallingR.getSubimage(24 + (64 * frameNumber), 21, 15, 23);
+            }
+            else {
+                image = fallingL.getSubimage(24 + (64 * frameNumber), 21, 15, 23);
+            }
         }
-        else if (jumpAnimation && facingLeft) {
-            image = jumpL.getSubimage(1 + (64 * frameNumber), 25, 15, 23);
+        else if (inAir && velocity < 0) {
+            if (facingRight) {
+                image = risingR.getSubimage(24 + (64 * frameNumber), 21, 15, 23);
+            }
+            else {
+                image = risingL.getSubimage(24 + (64 * frameNumber), 21, 15, 23);
+            }
         }
         else if ((left || right) && facingRight) {
             image = walkR.getSubimage(24 + (64 * frameNumber), 21, 15, 23);
@@ -181,6 +224,7 @@ public class Player implements KeyListener{
             image = walkL.getSubimage(24 + (64 * frameNumber), 21, 15, 23);
 //            System.out.println("WALK");
         }
+        //The game breaks here after the necromancer summons a jumping skeleton, resetting the level, and then moving right
         else if (facingRight) {
             image = standR.getSubimage(24 + (64 * (frameNumber / 3)), 21, 15, 23);
         }
@@ -328,7 +372,7 @@ public class Player implements KeyListener{
     public boolean playerOnTop(ArrayList<Player> players) {
         for (Player player: players) {
             if (player.isAvailable()) {
-                if (player != this && (player.getCollisionBox().getY() + player.getCollisionBox().getHeight() >= collisionBox.getY()) && (player.getCollisionBox().getY() <= collisionBox.getY()) && ((player.getCollisionBox().getX() < collisionBox.getX() && player.getCollisionBox().getX() + player.getCollisionBox().getWidth() > collisionBox.getX()) || (player.getCollisionBox().getX() < collisionBox.getX() + collisionBox.getWidth() && player.getCollisionBox().getX() + player.getCollisionBox().getWidth() > collisionBox.getX() + collisionBox.getWidth()))) {
+                if (player != this && (player.getCollisionBox().getY() + player.getCollisionBox().getHeight() >= collisionBox.getY()) && (player.getCollisionBox().getY() <= collisionBox.getY()) && ((player.getCollisionBox().getX() < collisionBox.getX() && player.getCollisionBox().getX() + player.getCollisionBox().getWidth() > collisionBox.getX()) || (player.getCollisionBox().getX() < collisionBox.getX() + collisionBox.getWidth() && player.getCollisionBox().getX() + player.getCollisionBox().getWidth() > collisionBox.getX() + collisionBox.getWidth()) || (player.getCollisionBox().getX() < collisionBox.getCenterX() && player.getCollisionBox().getX() + player.getCollisionBox().getWidth() > collisionBox.getCenterX()))) {
                     if (inAir) {
                         y = (int) (player.getY() + player.getCollisionBox().getHeight() + 1);
                     }
@@ -364,6 +408,43 @@ public class Player implements KeyListener{
         }
         return false;
     }
+    public boolean skeletonBelow(Skeleton skeleton) {
+        if (engine.getNecromancer().getSummon() != null) {
+            if (skeleton != this && (skeleton.getCollisionBox().getY() + skeleton.getCollisionBox().getHeight() >= collisionBox.getY() + collisionBox.getHeight()) && (skeleton.getCollisionBox().getY() <= collisionBox.getY() + collisionBox.getHeight()) && ((skeleton.getCollisionBox().getX() < collisionBox.getX() && skeleton.getCollisionBox().getX() + skeleton.getCollisionBox().getWidth() > collisionBox.getX()) || (skeleton.getCollisionBox().getX() < collisionBox.getX() + collisionBox.getWidth() && skeleton.getCollisionBox().getX() + skeleton.getCollisionBox().getWidth() > collisionBox.getX() + collisionBox.getWidth()) || (skeleton.getCollisionBox().getX() < collisionBox.getCenterX() && skeleton.getCollisionBox().getX() + skeleton.getCollisionBox().getWidth() > collisionBox.getCenterX()))) {
+                onCollisionBox = skeleton.getCollisionBox();
+                return true;
+            }
+        }
+        return false;
+    }
+    public boolean skeletonOnTop(Skeleton skeleton) {
+        if ((skeleton.getCollisionBox().getY() + skeleton.getCollisionBox().getHeight() >= collisionBox.getY()) && (skeleton.getCollisionBox().getY() <= collisionBox.getY()) && ((skeleton.getCollisionBox().getX() < collisionBox.getX() && skeleton.getCollisionBox().getX() + skeleton.getCollisionBox().getWidth() > collisionBox.getX()) || (skeleton.getCollisionBox().getX() < collisionBox.getX() + collisionBox.getWidth() && skeleton.getCollisionBox().getX() + skeleton.getCollisionBox().getWidth() > collisionBox.getX() + collisionBox.getWidth()) || (skeleton.getCollisionBox().getX() < collisionBox.getCenterX() && skeleton.getCollisionBox().getX() + skeleton.getCollisionBox().getWidth() > collisionBox.getCenterX()))) {
+            if (inAir) {
+                y = (int) (skeleton.getY() + skeleton.getCollisionBox().getHeight() + 1);
+            }
+            return true;
+        }
+        return false;
+    }
+    public boolean skeletonOnLeft(Skeleton skeleton) {
+        if ((skeleton.getCollisionBox().getX() + skeleton.getCollisionBox().getWidth() >= collisionBox.getX()) && (skeleton.getCollisionBox().getX() <= collisionBox.getX()) && ((skeleton.getCollisionBox().getY() <= collisionBox.getY() && skeleton.getCollisionBox().getY() + skeleton.getCollisionBox().getHeight() > collisionBox.getY()) || (skeleton.getCollisionBox().getY() < (collisionBox.getY() + collisionBox.getHeight()) && skeleton.getCollisionBox().getY() + skeleton.getCollisionBox().getHeight() > collisionBox.getY() + collisionBox.getHeight()) || (skeleton.getCollisionBox().getY() <= collisionBox.getCenterY() && skeleton.getCollisionBox().getY() + skeleton.getCollisionBox().getHeight() >= collisionBox.getCenterY()))) {
+            return true;
+        }
+        //first two statements determine if the player has clipped into the wall. The next one determines if the player is on the same y level as the wall
+        return false;
+    }
+
+    public boolean skeletonOnRight(Skeleton skeleton) {
+        if ((skeleton.getCollisionBox().getX() <= collisionBox.getX() + collisionBox.getWidth()) &&
+                (skeleton.getCollisionBox().getX() + skeleton.getCollisionBox().getWidth() >= collisionBox.getX() + collisionBox.getWidth()) &&
+                ((skeleton.getCollisionBox().getY() < collisionBox.getY() && skeleton.getCollisionBox().getY() + skeleton.getCollisionBox().getHeight() > collisionBox.getY()) ||
+                        (skeleton.getCollisionBox().getY() < collisionBox.getY() + collisionBox.getHeight() && skeleton.getCollisionBox().getY() + skeleton.getCollisionBox().getHeight() > collisionBox.getY() + collisionBox.getHeight()) ||
+                        (skeleton.getCollisionBox().getY() <= collisionBox.getCenterY() && skeleton.getCollisionBox().getY() + skeleton.getCollisionBox().getHeight() >= collisionBox.getCenterY()))) {
+            return true;
+        }
+
+        return false;
+    }
     public boolean reachEnd(Rectangle portal) {
         if (portal.contains(collisionBox.getCenterX(), collisionBox.getCenterY())) {
             left = false;
@@ -375,6 +456,45 @@ public class Player implements KeyListener{
         return false;
     }
 
+    public BufferedImage getRisingR() {
+        return risingR;
+    }
+
+    public void setRisingR(BufferedImage risingR) {
+        this.risingR = risingR;
+    }
+
+    public BufferedImage getRisingL() {
+        return risingL;
+    }
+
+    public void setRisingL(BufferedImage risingL) {
+        this.risingL = risingL;
+    }
+
+    public BufferedImage getFallingR() {
+        return fallingR;
+    }
+
+    public void setFallingR(BufferedImage fallingR) {
+        this.fallingR = fallingR;
+    }
+
+    public BufferedImage getFallingL() {
+        return fallingL;
+    }
+
+    public void setFallingL(BufferedImage fallingL) {
+        this.fallingL = fallingL;
+    }
+
+    public int getTimeInAir() {
+        return timeInAir;
+    }
+
+    public void setTimeInAir(int timeInAir) {
+        this.timeInAir = timeInAir;
+    }
 
     public int getVelocity() {
         return velocity;
@@ -416,13 +536,6 @@ public class Player implements KeyListener{
         this.walkR = walkR;
     }
 
-    public BufferedImage getJumpR() {
-        return jumpR;
-    }
-
-    public void setJumpR(BufferedImage jumpR) {
-        this.jumpR = jumpR;
-    }
 
     public BufferedImage getStandR() {
         return standR;
@@ -440,13 +553,6 @@ public class Player implements KeyListener{
         this.walkL = walkL;
     }
 
-    public BufferedImage getJumpL() {
-        return jumpL;
-    }
-
-    public void setJumpL(BufferedImage jumpL) {
-        this.jumpL = jumpL;
-    }
 
     public BufferedImage getStandL() {
         return standL;
@@ -548,13 +654,6 @@ public class Player implements KeyListener{
         this.facingLeft = facingLeft;
     }
 
-    public boolean isJumpAnimation() {
-        return jumpAnimation;
-    }
-
-    public void setJumpAnimation(boolean jumpAnimation) {
-        this.jumpAnimation = jumpAnimation;
-    }
 
     public boolean isInAir() {
         return inAir;
@@ -600,13 +699,13 @@ public class Player implements KeyListener{
                     if (!up && !inAir) {
                         frameNumber = 0;
                         up = true;
-                        jumpAnimation = true;
+                        timeInAir = 0;
                         velocity = -3;
                         velocityTimer = 0;
                     }
                     break;
                 case KeyEvent.VK_LEFT:
-                    if (!left && !jumpAnimation) {
+                    if (!left && !inAir) {
                         frameNumber = 0;
                     }
                     facingRight = false;
@@ -619,7 +718,7 @@ public class Player implements KeyListener{
                     frameNumber = 0;
                     break;
                 case KeyEvent.VK_RIGHT:
-                    if (!right && !jumpAnimation) {
+                    if (!right && !inAir) {
                         frameNumber = 0;
                     }
                     facingLeft = false;
@@ -654,7 +753,7 @@ public class Player implements KeyListener{
             switch (input) {
                 case KeyEvent.VK_LEFT:
                     left = false;
-                    if (!jumpAnimation) {
+                    if (!inAir) {
                         frameNumber = 0;
                     }
                     break;
@@ -663,7 +762,7 @@ public class Player implements KeyListener{
                     break;
                 case KeyEvent.VK_RIGHT:
                     right = false;
-                    if (!jumpAnimation) {
+                    if (!inAir) {
                         frameNumber = 0;
                     }
                     break;

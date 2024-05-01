@@ -1,6 +1,6 @@
 public class InWallException extends Exception {
 
-    public InWallException(String messgae) {
-        super(messgae);
+    public InWallException(String message) {
+        super(message);
     }
 }

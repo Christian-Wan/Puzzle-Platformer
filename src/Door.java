@@ -1,5 +1,9 @@
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class Door {
     //Is going to be the value in the Hashmap
@@ -9,7 +13,7 @@ public class Door {
 
     private Engine engine;
     private int number;
-    private boolean buttonOpen, keyOpen;
+    private boolean buttonOpen, keyOpen, wasOpen;
     private Rectangle collisionBox;
     private BufferedImage door;
     public Door(Engine engine, String doorNumber, int x , int y) {
@@ -18,6 +22,15 @@ public class Door {
         keyOpen = false;
         buttonOpen = false;
         collisionBox = new Rectangle(x, y, 32, 32);
+        wasOpen = false;
+        try {
+            if (number == 1) {
+                door = ImageIO.read(new File("image/Level_Assets/Walls_Tileset.png")).getSubimage(160, 112, 32, 32);
+            }
+            else {
+                door = ImageIO.read(new File("image/Level_Assets/Walls_Tileset.png")).getSubimage(208, 112, 32, 32);
+            }
+        } catch (IOException e) {}
     }
 
     public int getNumber() {
@@ -35,22 +48,64 @@ public class Door {
         return collisionBox;
     }
 
+    public boolean touchingBox(ArrayList<Box> boxes) {
+        for (Box box: boxes) {
+            if (getCollisionBox().intersects(box.getCollisionBox())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean touchingSummon(Skeleton skeleton) {
+        if (skeleton != null) {
+            if (skeleton.getCollisionBox().intersects(getCollisionBox())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean touchingPlayer(ArrayList<Player> players) {
+        for (Player player: players) {
+            if (collisionBox.intersects(player.getCollisionBox())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void update() {
         if (keyOpen || buttonOpen) {
             collisionBox.setBounds(collisionBox.x, collisionBox.y, 0, 0);
+            wasOpen = true;
         }
         else {
-            collisionBox.setBounds(collisionBox.x, collisionBox.y, 32, 32);
+            if (wasOpen) {
+                if (touchingPlayer(engine.getLevelLayout().getAvailableCharacters()) || touchingBox(engine.getLevelLayout().getBoxes())) {
+                    collisionBox.setBounds(collisionBox.x, collisionBox.y, 32, 32);
+                    wasOpen = false;
+                }
+                //This if statement is just for the necromancer's skeleton
+                else if (engine.getNecromancer() != null && engine.getNecromancer().getSummon() != null && touchingSummon(engine.getNecromancer().getSummon())) {
+                    collisionBox.setBounds(collisionBox.x, collisionBox.y, 32, 32);
+                    wasOpen = false;
+                }
+            }
+            else {
+                collisionBox.setBounds(collisionBox.x, collisionBox.y, 32, 32);
+            }
         }
     }
 
     public void draw(Graphics2D g) {
-        if (keyOpen || buttonOpen) {
-            g.setColor(Color.BLACK);
+        if (keyOpen || buttonOpen || wasOpen) {
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .25f));
         }
         else {
-            g.setColor(Color.CYAN);
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
         }
-        g.drawRect(collisionBox.x, collisionBox.y, 32, 32);
+        g.drawImage(door, collisionBox.x, collisionBox.y, 32, 32, null);
+        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
     }
 }

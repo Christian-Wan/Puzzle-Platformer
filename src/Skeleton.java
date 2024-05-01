@@ -69,7 +69,10 @@ public class Skeleton extends Player {
             }
         }
         for (Door door: super.getEngine().getLevelLayout().getDoors()) {
-            if (door.getCollisionBox().intersects(super.getCollisionBox()));
+            if (door.getCollisionBox().intersects(super.getCollisionBox())) {
+                System.out.println("reson3");
+                return true;
+            }
         }
         return false;
     }

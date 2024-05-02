@@ -18,12 +18,13 @@ public class LevelLayout {
     private String[][] levelData;
     private Engine engine;
     private ArrayList<Player> availableCharacters;
-    private boolean levelDone, swapped, resetting;
+    private boolean levelDone, swapped, resetting, paused;
     private int characterInControl;
     private ArrayList<Box> boxes;
     private HashMap<Opener, Door[]> openersAndDoors;
     private ArrayList<Opener> openers;
     private ArrayList<Door> doors;
+    private ArrayList<Spike> spikes;
 
     //Have like a list of all the characters that the player can control and when a character reaches the portal remove them from the list
 
@@ -35,10 +36,12 @@ public class LevelLayout {
         levelDone = false;
         characterInControl = 0;
         swapped = false;
+        paused = false;
         boxes = new ArrayList<Box>();
         openersAndDoors = new HashMap<Opener, Door[]>();
         openers = new ArrayList<Opener>();
         doors = new ArrayList<Door>();
+        spikes = new ArrayList<Spike>();
         combined = new BufferedImage(1500, 900, BufferedImage.TYPE_INT_ARGB);
         setTileSet();
         setWalls();
@@ -72,7 +75,7 @@ public class LevelLayout {
         Graphics g = combined.getGraphics();
         walls = new ArrayList<Rectangle>();
         //make sure to put the things that won't be counted as walls here
-        String nonWallTiles = "pzekb/[|n";
+        String nonWallTiles = "pzekb/[|n^";
         for (int r = 0; r < 27; r++) {
             for (int c = 0; c < 47; c++) {
                 if (!nonWallTiles.contains(levelData[r][c]) && !levelData[r][c].contains("[") && !levelData[r][c].contains("/") && !levelData[r][c].contains("|")) {
@@ -138,6 +141,12 @@ public class LevelLayout {
                     case "n":
                         engine.newNecromancer(c * 32 + 14, r * 32 + 20);
                         availableCharacters.add(engine.getNecromancer());
+                        break;
+                    case "^":
+                        spikes.add(new Spike (c * 32, r * 32 + 28));
+                        g.setColor(Color.PINK);
+                        g.drawRect(c * 32, r * 32 + 28, 32, 5);
+                        g.setColor(Color.BLACK);
                         break;
                 }
                 if (levelData[r][c].contains("/")) {
@@ -304,6 +313,8 @@ public class LevelLayout {
         swapped = false;
     }
 
+
+
     public ArrayList<Rectangle> getWalls() {
         return walls;
     }
@@ -322,5 +333,17 @@ public class LevelLayout {
 
     public ArrayList<Door> getDoors() {
         return doors;
+    }
+
+    public ArrayList<Spike> getSpikes() {
+        return spikes;
+    }
+
+    public boolean isPaused() {
+        return paused;
+    }
+
+    public void setPaused(boolean paused) {
+        this.paused = paused;
     }
 }

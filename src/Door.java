@@ -82,15 +82,22 @@ public class Door {
         }
         else {
             if (wasOpen) {
-                if (touchingPlayer(engine.getLevelLayout().getAvailableCharacters()) || touchingBox(engine.getLevelLayout().getBoxes())) {
-                    collisionBox.setBounds(collisionBox.x, collisionBox.y, 32, 32);
-                    wasOpen = false;
+                if (!touchingPlayer(engine.getLevelLayout().getAvailableCharacters()) && !touchingBox(engine.getLevelLayout().getBoxes())) {
+                    if (engine.getNecromancer() != null && engine.getNecromancer().getSummon() != null) {
+                        if (!touchingSummon(engine.getNecromancer().getSummon())) {
+                            collisionBox.setBounds(collisionBox.x, collisionBox.y, 32, 32);
+                            wasOpen = false;
+                        }
+                    }
+                    else {
+                        collisionBox.setBounds(collisionBox.x, collisionBox.y, 32, 32);
+                        wasOpen = false;
+                    }
                 }
-                //This if statement is just for the necromancer's skeleton
-                else if (engine.getNecromancer() != null && engine.getNecromancer().getSummon() != null && touchingSummon(engine.getNecromancer().getSummon())) {
-                    collisionBox.setBounds(collisionBox.x, collisionBox.y, 32, 32);
-                    wasOpen = false;
+                else {
+                    System.out.println("Problem 1");
                 }
+
             }
             else {
                 collisionBox.setBounds(collisionBox.x, collisionBox.y, 32, 32);

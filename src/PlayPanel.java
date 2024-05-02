@@ -23,6 +23,7 @@ public class PlayPanel extends JPanel implements MouseListener {
     }
 
     public void update() {
+
         engine.getLevelLayout().update();
         engine.getTransitions().update();
 //        System.out.println("ZXC");

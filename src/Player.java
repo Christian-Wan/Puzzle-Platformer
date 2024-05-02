@@ -15,7 +15,7 @@ public class Player implements KeyListener{
     private Engine engine;
     private int x, y, frameNumber, framesPassed, velocity, velocityTimer, timeInAir;
     final private int SCALE = 2;
-    private boolean up, down, left, right, facingRight, facingLeft, inAir, available, active;
+    private boolean up, down, left, right, facingRight, facingLeft, inAir, available, active, dead;
     private Rectangle collisionBox, onCollisionBox;
     //3 child classes that will be the mage knight and ?
     public Player(Engine engine) {
@@ -52,6 +52,7 @@ public class Player implements KeyListener{
         this.y = y;
         frameNumber = 0;
         framesPassed = 0;
+        dead = false;
         up = false;
         down = false;
         left = false;
@@ -83,6 +84,8 @@ public class Player implements KeyListener{
         framesPassed++;
         //Physics
         velocityTimer++;
+
+        touchingSpike(engine.getLevelLayout().getSpikes());
         if (reachEnd(engine.getPortal().getCollision())) {
             available = false;
             engine.getLevelLayout().checkLevelDone();
@@ -444,6 +447,16 @@ public class Player implements KeyListener{
         }
 
         return false;
+    }
+
+
+    public void touchingSpike(ArrayList<Spike> spikes) {
+        for (Spike spike: spikes) {
+            if (spike.getCollisionBox().intersects(collisionBox)) {
+                dead = true;
+                break;
+            }
+        }
     }
     public boolean reachEnd(Rectangle portal) {
         if (portal.contains(collisionBox.getCenterX(), collisionBox.getCenterY())) {

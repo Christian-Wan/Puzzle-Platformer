@@ -15,7 +15,7 @@ public class Player implements KeyListener{
     private Engine engine;
     private int x, y, frameNumber, framesPassed, velocity, velocityTimer, timeInAir;
     final private int SCALE = 2;
-    private boolean up, down, left, right, facingRight, facingLeft, inAir, available, active, dead;
+    private boolean up, down, left, right, facingRight, facingLeft, inAir, available, active;
     private Rectangle collisionBox, onCollisionBox;
     //3 child classes that will be the mage knight and ?
     public Player(Engine engine) {
@@ -52,7 +52,6 @@ public class Player implements KeyListener{
         this.y = y;
         frameNumber = 0;
         framesPassed = 0;
-        dead = false;
         up = false;
         down = false;
         left = false;
@@ -453,7 +452,8 @@ public class Player implements KeyListener{
     public void touchingSpike(ArrayList<Spike> spikes) {
         for (Spike spike: spikes) {
             if (spike.getCollisionBox().intersects(collisionBox)) {
-                dead = true;
+                available = false;
+                engine.getLevelLayout().setPaused(false);
                 break;
             }
         }
@@ -709,52 +709,65 @@ public class Player implements KeyListener{
             int input = e.getKeyCode();
             switch (input) {
                 case KeyEvent.VK_UP:
-                    if (!up && !inAir) {
-                        frameNumber = 0;
-                        up = true;
-                        timeInAir = 0;
-                        velocity = -3;
-                        velocityTimer = 0;
+                    if (!engine.getLevelLayout().isPaused()) {
+                        if (!up && !inAir) {
+                            frameNumber = 0;
+                            up = true;
+                            timeInAir = 0;
+                            velocity = -3;
+                            velocityTimer = 0;
+                        }
                     }
                     break;
                 case KeyEvent.VK_LEFT:
-                    if (!left && !inAir) {
-                        frameNumber = 0;
-                    }
-                    facingRight = false;
-                    facingLeft = true;
-                    left = true;
+                    if (!engine.getLevelLayout().isPaused()) {
+                        if (!left && !inAir) {
+                            frameNumber = 0;
+                        }
+                        facingRight = false;
+                        facingLeft = true;
+                        left = true;
 //                System.out.println("LEFT");
-                    break;
-                case KeyEvent.VK_DOWN:
-                    down = true;
-                    frameNumber = 0;
-                    break;
-                case KeyEvent.VK_RIGHT:
-                    if (!right && !inAir) {
-                        frameNumber = 0;
+                        break;
                     }
-                    facingLeft = false;
-                    facingRight = true;
-                    right = true;
+                case KeyEvent.VK_DOWN:
+                    if (!engine.getLevelLayout().isPaused()) {
+                        down = true;
+                        frameNumber = 0;
+                        break;
+                    }
+                case KeyEvent.VK_RIGHT:
+                    if (!engine.getLevelLayout().isPaused()) {
+                        if (!right && !inAir) {
+                            frameNumber = 0;
+                        }
+                        facingLeft = false;
+                        facingRight = true;
+                        right = true;
 //                System.out.println("RIGHT");
-                    break;
+                        break;
+                    }
                 case KeyEvent.VK_E:
-                    doAbility();
-                    break;
+                    if (!engine.getLevelLayout().isPaused()) {
+                        doAbility();
+                        break;
+                    }
                 case KeyEvent.VK_R:
                     System.out.println("ASD" + this);
+                    engine.getLevelLayout().setPaused(false);
                     resetStage();
                     break;
                 case KeyEvent.VK_Q:
-                    System.out.println("ASD" + this);
-                    if (!inAir) {
-                        frameNumber = 0;
+                    if (!engine.getLevelLayout().isPaused()) {
+                        System.out.println("ASD" + this);
+                        if (!inAir) {
+                            frameNumber = 0;
+                        }
+                        right = false;
+                        left = false;
+                        engine.getLevelLayout().changeActive();
+                        break;
                     }
-                    right = false;
-                    left = false;
-                    engine.getLevelLayout().changeActive();
-                    break;
             }
         }
     }

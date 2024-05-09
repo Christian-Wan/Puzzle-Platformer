@@ -278,7 +278,13 @@ public class LevelLayout {
             }
         }
 
-
+        if (paused) {
+            System.out.println("Here");
+            g.setColor(Color.WHITE);
+            //This is temp will need to have image of text
+            g.setFont(new Font("Pixelfy Sans", Font.PLAIN, 60));
+            g.drawString("Press R to Reset", 500, 700);
+        }
 //        System.out.println("QWE");
     }
 

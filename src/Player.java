@@ -453,7 +453,7 @@ public class Player implements KeyListener{
         for (Spike spike: spikes) {
             if (spike.getCollisionBox().intersects(collisionBox)) {
                 available = false;
-                engine.getLevelLayout().setPaused(false);
+                engine.getLevelLayout().resetStage();
                 break;
             }
         }
@@ -709,65 +709,55 @@ public class Player implements KeyListener{
             int input = e.getKeyCode();
             switch (input) {
                 case KeyEvent.VK_UP:
-                    if (!engine.getLevelLayout().isPaused()) {
-                        if (!up && !inAir) {
-                            frameNumber = 0;
-                            up = true;
-                            timeInAir = 0;
-                            velocity = -3;
-                            velocityTimer = 0;
-                        }
+                    if (!up && !inAir) {
+                        frameNumber = 0;
+                        up = true;
+                        timeInAir = 0;
+                        velocity = -3;
+                        velocityTimer = 0;
                     }
                     break;
                 case KeyEvent.VK_LEFT:
-                    if (!engine.getLevelLayout().isPaused()) {
-                        if (!left && !inAir) {
-                            frameNumber = 0;
-                        }
-                        facingRight = false;
-                        facingLeft = true;
-                        left = true;
-//                System.out.println("LEFT");
-                        break;
-                    }
-                case KeyEvent.VK_DOWN:
-                    if (!engine.getLevelLayout().isPaused()) {
-                        down = true;
+                    if (!left && !inAir) {
                         frameNumber = 0;
-                        break;
                     }
+                    facingRight = false;
+                    facingLeft = true;
+                    left = true;
+//                System.out.println("LEFT");
+
+                    break;
+                case KeyEvent.VK_DOWN:
+                    down = true;
+                    frameNumber = 0;
+
+                    break;
                 case KeyEvent.VK_RIGHT:
-                    if (!engine.getLevelLayout().isPaused()) {
-                        if (!right && !inAir) {
-                            frameNumber = 0;
-                        }
-                        facingLeft = false;
-                        facingRight = true;
-                        right = true;
+                    if (!right && !inAir) {
+                        frameNumber = 0;
+                    }
+                    facingLeft = false;
+                    facingRight = true;
+                    right = true;
 //                System.out.println("RIGHT");
-                        break;
-                    }
+                    break;
                 case KeyEvent.VK_E:
-                    if (!engine.getLevelLayout().isPaused()) {
-                        doAbility();
-                        break;
-                    }
+                    doAbility();
+                    break;
                 case KeyEvent.VK_R:
-                    System.out.println("ASD" + this);
-                    engine.getLevelLayout().setPaused(false);
+//                    System.out.println("ASD" + this);
                     resetStage();
+
                     break;
                 case KeyEvent.VK_Q:
-                    if (!engine.getLevelLayout().isPaused()) {
-                        System.out.println("ASD" + this);
-                        if (!inAir) {
-                            frameNumber = 0;
-                        }
-                        right = false;
-                        left = false;
-                        engine.getLevelLayout().changeActive();
-                        break;
+//                    System.out.println("ASD" + this);
+                    if (!inAir) {
+                        frameNumber = 0;
                     }
+                    right = false;
+                    left = false;
+                    engine.getLevelLayout().changeActive();
+                    break;
             }
         }
     }

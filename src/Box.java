@@ -121,7 +121,7 @@ public class Box {
 
     public boolean doorOnRight(ArrayList<Door> doors, int x) {
         for (Door door: doors) {
-            if ((door.getCollisionBox().x + engine.getSCALE() <= x + collisionBox.getWidth()) && (door.getCollisionBox().x + engine.getSCALE() + door.getCollisionBox().width >= x + collisionBox.getWidth()) && ((door.getCollisionBox().y < collisionBox.getY() && door.getCollisionBox().y + door.getCollisionBox().height > collisionBox.getY()) || (door.getCollisionBox().y < collisionBox.getY() + collisionBox.getHeight() && door.getCollisionBox().y + door.getCollisionBox().height > collisionBox.getY()  + collisionBox.getHeight()))) {
+            if ((door.getX() <= x + collisionBox.getWidth()) && (door.getX() + door.getCollisionBox().getWidth() >= x + collisionBox.getWidth()) && ((door.getY() < collisionBox.getY() && door.getY() + door.getCollisionBox().getHeight() > collisionBox.getY()) || (door.getY() < collisionBox.getY() + collisionBox.getHeight() && door.getY() + door.getCollisionBox().getHeight() > collisionBox.getY()  + collisionBox.getHeight()) || (door.getY() < collisionBox.getCenterY() && door.getY() + door.getCollisionBox().getHeight() > collisionBox.getCenterY()))) {
                 return true;
             }
         }
@@ -136,19 +136,18 @@ public class Box {
         }
         return false;
     }
-    public boolean boxOnLeft(ArrayList<Box> boxes) {
+    public boolean boxOnLeft(ArrayList<Box> boxes, int x) {
         for (Box box: boxes) {
-            if ((box.getX() + 32 >= collisionBox.getX()) && (box.getX() <= collisionBox.getX()) && ((box.getY() < collisionBox.getY() && box.getY() + 32 > collisionBox.getY()) || (box.getY() < (collisionBox.getY() + collisionBox.getHeight()) && box.getY() + 32 > collisionBox.getY() + collisionBox.getHeight()) || (box.getY() <= collisionBox.getCenterY() && box.getY() + 32 >= collisionBox.getCenterY()))) {
+            if ((box.getX() + box.getCollisionBox().width > x) && (box.getX() <= x) && ((box.getY() < collisionBox.getY() && box.getY() + box.getCollisionBox().height > collisionBox.getY()) || (box.getY() < (collisionBox.getY() + collisionBox.getHeight()) && box.getY() + box.getCollisionBox().height > collisionBox.getY()  + collisionBox.getHeight()) || (box.getY() < collisionBox.getCenterY() && box.getY() + box.getCollisionBox().getHeight() > collisionBox.getCenterY()))) {
                 return true;
             }
-
         }
         return false;
     }
 
-    public boolean boxOnRight(ArrayList<Box> boxes) {
+    public boolean boxOnRight(ArrayList<Box> boxes, int x) {
         for (Box box: boxes) {
-            if ((box.getX() <= collisionBox.getX() + collisionBox.getWidth()) && (box.getX() + 32 >= collisionBox.getX() + collisionBox.getWidth()) && ((box.getY() < collisionBox.getY() && box.getY() + 32 > collisionBox.getY()) || (box.getY() < collisionBox.getY() + collisionBox.getHeight() && box.getY() + 32 > collisionBox.getY() + collisionBox.getHeight()) || (box.getY() <= collisionBox.getCenterY() && box.getY() + 32 >= collisionBox.getCenterY()))) {
+            if (box != this && (box.getX() <= x + collisionBox.getWidth()) && (box.getX() + box.getCollisionBox().getWidth() >= x + collisionBox.getWidth()) && ((box.getY() < collisionBox.getY() && box.getY() + box.getCollisionBox().getHeight() > collisionBox.getY()) || (box.getY() < collisionBox.getY() + collisionBox.getHeight() && box.getY() + box.getCollisionBox().getHeight() > collisionBox.getY()  + collisionBox.getHeight()) || (box.getY() < collisionBox.getCenterY() && box.getY() + box.getCollisionBox().getHeight() > collisionBox.getCenterY()))) {
                 return true;
             }
         }
@@ -156,7 +155,7 @@ public class Box {
     }
     public void checkChangeX(int change) {
         if (change > 0) {
-            if (!wallOnRight(engine.getLevelLayout().getWalls(), x + change) && !playerOnRight(engine.getLevelLayout().getAvailableCharacters(), x + change) && !doorOnRight(engine.getLevelLayout().getDoors(), x + change)) {
+            if (!wallOnRight(engine.getLevelLayout().getWalls(), x + change) && !playerOnRight(engine.getLevelLayout().getAvailableCharacters(), x + change) && !doorOnRight(engine.getLevelLayout().getDoors(), x + change) && !boxOnRight(engine.getLevelLayout().getBoxes(), x + change)) {
                 if (engine.getNecromancer() != null && engine.getNecromancer().getSummon() != null) {
                     if (!skeletonOnRight(engine.getNecromancer().getSummon(), x + change)) {
                         x += change;
@@ -168,7 +167,7 @@ public class Box {
             }
         }
         if (change < 0) {
-            if (!wallOnLeft(engine.getLevelLayout().getWalls(), x + change) && !playerOnLeft(engine.getLevelLayout().getAvailableCharacters(), x + change)) {
+            if (!wallOnLeft(engine.getLevelLayout().getWalls(), x + change) && !playerOnLeft(engine.getLevelLayout().getAvailableCharacters(), x + change) && !boxOnLeft(engine.getLevelLayout().getBoxes(), x + 2)) {
                 if (engine.getNecromancer() != null && engine.getNecromancer().getSummon() != null) {
                     if (!skeletonOnLeft(engine.getNecromancer().getSummon(), x + change)) {
                         x += change;

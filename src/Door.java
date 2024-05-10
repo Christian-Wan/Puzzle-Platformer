@@ -12,16 +12,18 @@ public class Door {
     //When Button is pressed the Door opens, when you get off the door closes
 
     private Engine engine;
-    private int number;
+    private int number, x, y;
     private boolean buttonOpen, keyOpen, wasOpen;
-    private Rectangle collisionBox;
+    private Rectangle collisionBox, location;
     private BufferedImage door;
     public Door(Engine engine, String doorNumber, int x , int y) {
         this.engine = engine;
         number = Integer.parseInt(doorNumber.substring(1));
+
         keyOpen = false;
         buttonOpen = false;
         collisionBox = new Rectangle(x, y, 32, 32);
+        location = new Rectangle(x, y, 32, 32);
         wasOpen = false;
         try {
             if (number == 1) {
@@ -50,7 +52,7 @@ public class Door {
 
     public boolean touchingBox(ArrayList<Box> boxes) {
         for (Box box: boxes) {
-            if (getCollisionBox().intersects(box.getCollisionBox())) {
+            if (location.intersects(box.getCollisionBox())) {
                 return true;
             }
         }
@@ -59,7 +61,7 @@ public class Door {
 
     public boolean touchingSummon(Skeleton skeleton) {
         if (skeleton != null) {
-            if (skeleton.getCollisionBox().intersects(getCollisionBox())) {
+            if (skeleton.getCollisionBox().intersects(location)) {
                 return true;
             }
         }
@@ -68,7 +70,7 @@ public class Door {
 
     public boolean touchingPlayer(ArrayList<Player> players) {
         for (Player player: players) {
-            if (collisionBox.intersects(player.getCollisionBox())) {
+            if (location.intersects(player.getCollisionBox())) {
                 return true;
             }
         }
@@ -82,6 +84,8 @@ public class Door {
         }
         else {
             if (wasOpen) {
+                System.out.println("Touching player: " + touchingPlayer(engine.getLevelLayout().getAvailableCharacters()));
+                System.out.println(engine.getLevelLayout().getAvailableCharacters());
                 if (!touchingPlayer(engine.getLevelLayout().getAvailableCharacters()) && !touchingBox(engine.getLevelLayout().getBoxes())) {
                     if (engine.getNecromancer() != null && engine.getNecromancer().getSummon() != null) {
                         if (!touchingSummon(engine.getNecromancer().getSummon())) {
@@ -114,5 +118,13 @@ public class Door {
         }
         g.drawImage(door, collisionBox.x, collisionBox.y, 32, 32, null);
         g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
     }
 }

@@ -12,14 +12,13 @@ public class Door {
     //When Button is pressed the Door opens, when you get off the door closes
 
     private Engine engine;
-    private int number, x, y;
+    private int number;
     private boolean buttonOpen, keyOpen, wasOpen;
     private Rectangle collisionBox, location;
     private BufferedImage door;
     public Door(Engine engine, String doorNumber, int x , int y) {
         this.engine = engine;
         number = Integer.parseInt(doorNumber.substring(1));
-
         keyOpen = false;
         buttonOpen = false;
         collisionBox = new Rectangle(x, y, 32, 32);
@@ -118,13 +117,15 @@ public class Door {
         }
         g.drawImage(door, collisionBox.x, collisionBox.y, 32, 32, null);
         g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+        g.drawRect(collisionBox.x, collisionBox.y, 32, 32);
+
     }
 
     public int getX() {
-        return x;
+        return collisionBox.x;
     }
 
     public int getY() {
-        return y;
+        return collisionBox.y;
     }
 }

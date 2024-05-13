@@ -101,7 +101,7 @@ public class Box {
     }
     public boolean onTopOfDoor(ArrayList<Door> doors) {
         for (Door door: doors) {
-            if ((door.getCollisionBox().getY() + door.getCollisionBox().getHeight() >= collisionBox.getY() + collisionBox.getHeight()) && (door.getCollisionBox().getY() <= collisionBox.getY() + collisionBox.getHeight()) && ((door.getCollisionBox().getX() < collisionBox.getX() && door.getCollisionBox().getX() + door.getCollisionBox().getWidth() > collisionBox.getX()) || (door.getCollisionBox().getX() < collisionBox.getX() + collisionBox.getWidth() && door.getCollisionBox().getX() + door.getCollisionBox().getWidth() > collisionBox.getX() + collisionBox.getWidth()))) {
+            if ((door.getY() + door.getCollisionBox().getHeight() >= collisionBox.getY() + collisionBox.getHeight()) && (door.getY() <= collisionBox.getY() + collisionBox.getHeight()) && ((door.getX() < collisionBox.getX() && door.getX() + door.getCollisionBox().getWidth() > collisionBox.getX()) || (door.getX() < collisionBox.getX() + collisionBox.getWidth() && door.getX() + door.getCollisionBox().getWidth() > collisionBox.getX() + collisionBox.getWidth()) || (door.getX() < collisionBox.getCenterX() && door.getX() + door.getCollisionBox().getWidth() > collisionBox.getCenterX()))) {
                 onCollisionBox = door.getCollisionBox();
                 return true;
             }
@@ -109,13 +109,12 @@ public class Box {
         return false;
     }
 
-    public boolean doorOnLeft(ArrayList<Door> doors) {
+    public boolean doorOnLeft(ArrayList<Door> doors, int x) {
         for (Door door: doors) {
-            if ((door.getCollisionBox().getX() + door.getCollisionBox().getWidth() >= collisionBox.getX()) && (door.getCollisionBox().getX() <= collisionBox.getX()) && ((door.getCollisionBox().getY() < collisionBox.getY() && door.getCollisionBox().getY() + door.getCollisionBox().getHeight() > collisionBox.getY()) || (door.getCollisionBox().getY() < (collisionBox.getY() + collisionBox.getHeight()) && door.getCollisionBox().getY() + door.getCollisionBox().getHeight() > collisionBox.getY() + collisionBox.getHeight()) || (door.getCollisionBox().getY() < collisionBox.getCenterY() && door.getCollisionBox().getY() + door.getCollisionBox().getHeight() > collisionBox.getCenterY()))) {
+            if ((door.getX() + door.getCollisionBox().width > x) && (door.getX() <= x) && ((door.getY() < collisionBox.getY() && door.getY() + door.getCollisionBox().height > collisionBox.getY()) || (door.getY() < (collisionBox.getY() + collisionBox.getHeight()) && door.getY() + door.getCollisionBox().height > collisionBox.getY()  + collisionBox.getHeight()) || (door.getY() < collisionBox.getCenterY() && door.getY() + door.getCollisionBox().getHeight() > collisionBox.getCenterY()))) {
                 return true;
             }
         }
-        //first two statements determine if the player has clipped into the wall. The next one determines if the player is on the same y level as the wall
         return false;
     }
 
@@ -138,7 +137,7 @@ public class Box {
     }
     public boolean boxOnLeft(ArrayList<Box> boxes, int x) {
         for (Box box: boxes) {
-            if ((box.getX() + box.getCollisionBox().width > x) && (box.getX() <= x) && ((box.getY() < collisionBox.getY() && box.getY() + box.getCollisionBox().height > collisionBox.getY()) || (box.getY() < (collisionBox.getY() + collisionBox.getHeight()) && box.getY() + box.getCollisionBox().height > collisionBox.getY()  + collisionBox.getHeight()) || (box.getY() < collisionBox.getCenterY() && box.getY() + box.getCollisionBox().getHeight() > collisionBox.getCenterY()))) {
+            if (box != this && (box.getX() + box.getCollisionBox().width > x) && (box.getX() <= x) && ((box.getY() < collisionBox.getY() && box.getY() + box.getCollisionBox().height > collisionBox.getY()) || (box.getY() < (collisionBox.getY() + collisionBox.getHeight()) && box.getY() + box.getCollisionBox().height > collisionBox.getY()  + collisionBox.getHeight()) || (box.getY() < collisionBox.getCenterY() && box.getY() + box.getCollisionBox().getHeight() > collisionBox.getCenterY()))) {
                 return true;
             }
         }
@@ -167,7 +166,7 @@ public class Box {
             }
         }
         if (change < 0) {
-            if (!wallOnLeft(engine.getLevelLayout().getWalls(), x + change) && !playerOnLeft(engine.getLevelLayout().getAvailableCharacters(), x + change) && !boxOnLeft(engine.getLevelLayout().getBoxes(), x + 2)) {
+            if (!wallOnLeft(engine.getLevelLayout().getWalls(), x + change) && !playerOnLeft(engine.getLevelLayout().getAvailableCharacters(), x + change) && !boxOnLeft(engine.getLevelLayout().getBoxes(), x + 2) && !doorOnLeft(engine.getLevelLayout().getDoors(), x + 2)) {
                 if (engine.getNecromancer() != null && engine.getNecromancer().getSummon() != null) {
                     if (!skeletonOnLeft(engine.getNecromancer().getSummon(), x + change)) {
                         x += change;
@@ -180,10 +179,19 @@ public class Box {
         }
     }
     public void update() {
-        if (!touchingPlatform(engine.getLevelLayout().getWalls()) && !playerBelow(engine.getLevelLayout().getAvailableCharacters()) && !skeletonBelow(engine.getNecromancer().getSummon())) {
-            y += velocity;
-            inAir = true;
-            velocityTimer++;
+        if (!touchingPlatform(engine.getLevelLayout().getWalls()) && !playerBelow(engine.getLevelLayout().getAvailableCharacters()) && !touchingBox(engine.getLevelLayout().getBoxes()) && !onTopOfDoor(engine.getLevelLayout().getDoors())) {
+            if (engine.getNecromancer() != null && engine.getNecromancer().getSummon() != null) {
+                if (!skeletonBelow(engine.getNecromancer().getSummon())) {
+                    y += velocity;
+                    inAir = true;
+                    velocityTimer++;
+                }
+            }
+            else {
+                y += velocity;
+                inAir = true;
+                velocityTimer++;
+            }
         }
         else {
             if (inAir) {

@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class Skeleton extends Player {
 
@@ -90,10 +91,11 @@ public class Skeleton extends Player {
     public boolean skeletonOnLeft(Skeleton skeleton) {
         return false;
     }
-
     public boolean skeletonOnRight(Skeleton skeleton) {
         return false;
     }
+    //makes it so that skeleton is affected by spikes
+    public void touchingSpike(ArrayList<Spike> Spikes) {}
     //makes it so that skeleton can't receive key inputs
     public void keyPressed(KeyEvent e) {
 

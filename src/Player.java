@@ -99,7 +99,7 @@ public class Player implements KeyListener{
         }
 
         //if touching platform send player to top of the platform
-        if (touchingPlatform(engine.getLevelLayout().getWalls()) || touchingBox(engine.getLevelLayout().getBoxes()) || onPlayer(engine.getLevelLayout().getAvailableCharacters()) || onTopOfDoor(engine.getLevelLayout().getDoors())) {
+        if (touchingPlatform(engine.getLevelLayout().getWalls()) || touchingBox(engine.getLevelLayout().getBoxes()) || onPlayer(engine.getLevelLayout().getAvailableCharacters()) || onTopOfDoor(engine.getLevelLayout().getDoors()) || onOneWayPlatform(engine.getLevelLayout().getOneWayPlatforms())) {
             if (inAir) {
                 y = (int) (onCollisionBox.getY() - collisionBox.getHeight());
                 velocity = 4;
@@ -239,7 +239,15 @@ public class Player implements KeyListener{
     }
 
 
-    //Don't know if true but the player can most likely walk through walls if the wall is smaller than the player and the wall is at player's chest level
+    public boolean onOneWayPlatform(ArrayList<Rectangle> oneWayPlatforms) {
+        for (Rectangle platform: oneWayPlatforms) {
+            if (platform.contains(x, y + collisionBox.getHeight())) {
+                onCollisionBox = platform;
+                return true;
+            }
+        }
+        return false;
+    }
     public boolean touchingPlatform(ArrayList<Rectangle> rectangles) {
         for (Rectangle rect: rectangles) {
             if ((rect.getY() + rect.getHeight() >= collisionBox.getY() + collisionBox.getHeight()) && (rect.getY() <= collisionBox.getY() + collisionBox.getHeight()) && ((rect.getX() < collisionBox.getX() && rect.getX() + rect.getWidth() > collisionBox.getX()) || (rect.getX() < collisionBox.getX() + collisionBox.getWidth() && rect.getX() + rect.getWidth() > collisionBox.getX() + collisionBox.getWidth()))) {

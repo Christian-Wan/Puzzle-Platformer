@@ -14,11 +14,11 @@ public class LevelLayout {
 
     private BufferedImage topLeftCorner, topRightCorner, bottomLeftCorner, bottomRightCorner, upWall, leftWall, rightWall, downWall, darkness, topLeftDarkness, topRightDarkness, bottomLeftDarkness, bottomRightDarkness;
     private BufferedImage combined;
-    private ArrayList<Rectangle> walls;
+    private ArrayList<Rectangle> walls, oneWayPlatforms;
     private String[][] levelData;
     private Engine engine;
     private ArrayList<Player> availableCharacters;
-    private boolean levelDone, swapped, resetting, paused;
+    private boolean levelDone, swapped, resetting;
     private int characterInControl;
     private ArrayList<Box> boxes;
     private HashMap<Opener, Door[]> openersAndDoors;
@@ -36,12 +36,12 @@ public class LevelLayout {
         levelDone = false;
         characterInControl = 0;
         swapped = false;
-        paused = false;
         boxes = new ArrayList<Box>();
         openersAndDoors = new HashMap<Opener, Door[]>();
         openers = new ArrayList<Opener>();
         doors = new ArrayList<Door>();
         spikes = new ArrayList<Spike>();
+        oneWayPlatforms = new ArrayList<Rectangle>();
         combined = new BufferedImage(1500, 900, BufferedImage.TYPE_INT_ARGB);
         setTileSet();
         setWalls();
@@ -75,7 +75,7 @@ public class LevelLayout {
         Graphics g = combined.getGraphics();
         walls = new ArrayList<Rectangle>();
         //make sure to put the things that won't be counted as walls here
-        String nonWallTiles = "pzekb/[|n^";
+        String nonWallTiles = "pzekb/[|n^<>-";
         for (int r = 0; r < 27; r++) {
             for (int c = 0; c < 47; c++) {
                 if (!nonWallTiles.contains(levelData[r][c]) && !levelData[r][c].contains("[") && !levelData[r][c].contains("/") && !levelData[r][c].contains("|")) {
@@ -148,6 +148,18 @@ public class LevelLayout {
                         g.drawRect(c * 32, r * 32 + 28, 32, 5);
                         g.setColor(Color.BLACK);
                         break;
+                    case "<", "-", ">":
+                        oneWayPlatforms.add(new Rectangle(c * 32, r * 32 + 16, 32, 5));
+                        g.setColor(Color.GREEN);
+                        g.drawRect(c * 32, r * 32 + 16, 32, 5);
+                        g.setColor(Color.BLACK);
+                        break;
+//                    case "-":
+//                        oneWayPlatforms.add(new OneWayPlatform(c * 32, r * 32 + 16, 1));
+//                        break;
+//                    case ">":
+//                        oneWayPlatforms.add(new OneWayPlatform(c * 32, r * 32 + 16, 1));
+//                        break;
                 }
                 if (levelData[r][c].contains("/")) {
                     openers.add(new Key(engine, levelData[r][c], c * 32 + 8, r * 32 + 9));
@@ -278,13 +290,6 @@ public class LevelLayout {
             }
         }
 
-        if (paused) {
-            System.out.println("Here");
-            g.setColor(Color.WHITE);
-            //This is temp will need to have image of text
-            g.setFont(new Font("Pixelfy Sans", Font.PLAIN, 60));
-            g.drawString("Press R to Reset", 500, 700);
-        }
 //        System.out.println("QWE");
     }
 
@@ -345,11 +350,8 @@ public class LevelLayout {
         return spikes;
     }
 
-    public boolean isPaused() {
-        return paused;
-    }
 
-    public void setPaused(boolean paused) {
-        this.paused = paused;
+    public ArrayList<Rectangle> getOneWayPlatforms() {
+        return oneWayPlatforms;
     }
 }

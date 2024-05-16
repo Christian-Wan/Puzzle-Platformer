@@ -28,6 +28,7 @@ public class LevelSelectionPanel extends JPanel implements MouseListener {
         levels[0][4] = new Rectangle(450, 150, 50, 50);
         levels[1][0] = new Rectangle(50, 250, 50, 50);
         levels[1][1] = new Rectangle(150, 250, 50, 50);
+        levels[1][2] = new Rectangle(250, 250, 50, 50);
     }
     public void update() {
         engine.getTransitions().update();

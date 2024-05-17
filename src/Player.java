@@ -13,7 +13,7 @@ public class Player implements KeyListener{
 
     private BufferedImage walkR, standR, walkL, standL, risingR, risingL, fallingR, fallingL;
     private Engine engine;
-    private int x, y, frameNumber, framesPassed, velocity, velocityTimer, timeInAir;
+    private int x, y, frameNumber, framesPassed, velocity, velocityTimer, timeInAir, pastX, pastY;
     final private int SCALE = 2;
     private boolean up, down, left, right, facingRight, facingLeft, inAir, available, active;
     private Rectangle collisionBox, onCollisionBox;
@@ -62,6 +62,8 @@ public class Player implements KeyListener{
         available = true;
         active = false;
         timeInAir = 0;
+        pastY = 0;
+        pastY = 0;
         collisionBox = new Rectangle(x + SCALE, y, 14 * SCALE, 22 * SCALE);
         try {
             walkR = ImageIO.read(new File("image/Mage/Mage_WalkR.png"));
@@ -102,7 +104,10 @@ public class Player implements KeyListener{
         if (touchingPlatform(engine.getLevelLayout().getWalls()) || touchingBox(engine.getLevelLayout().getBoxes()) || onPlayer(engine.getLevelLayout().getAvailableCharacters()) || onTopOfDoor(engine.getLevelLayout().getDoors()) || onOneWayPlatform(engine.getLevelLayout().getOneWayPlatforms())) {
             if (inAir) {
                 y = (int) (onCollisionBox.getY() - collisionBox.getHeight());
+                collisionBox.setLocation(x, y);
                 velocity = 4;
+                System.out.println("HAPPEN: " + (onCollisionBox.getY()));
+
             }
             inAir = false;
         }
@@ -110,12 +115,12 @@ public class Player implements KeyListener{
             if (inAir) {
                 y = (int) (onCollisionBox.getY() - collisionBox.getHeight());
                 velocity = 4;
-                System.out.println("Touch");
             }
             inAir = false;
 
         }
         else {
+            System.out.println("IN AIR");
             inAir = true;
             frameNumber = 0;
         }
@@ -161,6 +166,8 @@ public class Player implements KeyListener{
                 velocity++;
             }
         }
+        pastX = collisionBox.x;
+        pastY = collisionBox.y;
         collisionBox.setLocation(x + SCALE, y);
 
         //Animations
@@ -241,9 +248,11 @@ public class Player implements KeyListener{
 
     public boolean onOneWayPlatform(ArrayList<Rectangle> oneWayPlatforms) {
         for (Rectangle platform: oneWayPlatforms) {
-            if (platform.contains(x, y + collisionBox.getHeight())) {
-                onCollisionBox = platform;
-                return true;
+            if (pastY + collisionBox.getHeight() <= platform.y) {
+                if ((platform.getY() + platform.getHeight() >= collisionBox.getY() + collisionBox.getHeight()) && (platform.getY() <= collisionBox.getY() + collisionBox.getHeight()) && ((platform.getX() < collisionBox.getX() && platform.getX() + platform.getWidth() > collisionBox.getX()) || (platform.getX() < collisionBox.getX() + collisionBox.getWidth() && platform.getX() + platform.getWidth() > collisionBox.getX() + collisionBox.getWidth()))) {
+                    onCollisionBox = platform;
+                    return true;
+                }
             }
         }
         return false;

@@ -24,6 +24,15 @@ public class Box {
         } catch (IOException e) {}
     }
 
+    public boolean onOneWayPlatform(ArrayList<Rectangle> oneWayPlatforms) {
+        for (Rectangle platform: oneWayPlatforms) {
+            if ((platform.getY() + platform.getHeight() >= collisionBox.getY() + collisionBox.getHeight()) && (platform.getY() <= collisionBox.getY() + collisionBox.getHeight()) && ((platform.getX() < collisionBox.getX() && platform.getX() + platform.getWidth() > collisionBox.getX()) || (platform.getX() < collisionBox.getX() + collisionBox.getWidth() && platform.getX() + platform.getWidth() > collisionBox.getX() + collisionBox.getWidth()) || (collisionBox.getCenterX() <= platform.getX() + platform.getWidth() && collisionBox.getCenterX() >= platform.x))) {
+                onCollisionBox = platform;
+                return true;
+            }
+        }
+        return false;
+    }
     public boolean touchingPlatform(ArrayList<Rectangle> rectangles) {
         for (Rectangle rect: rectangles) {
             if ((rect.getY() + rect.getHeight() >= collisionBox.getY() + collisionBox.getHeight()) && (rect.getY() <= collisionBox.getY() + collisionBox.getHeight()) && ((rect.getX() < collisionBox.getX() && rect.getX() + rect.getWidth() > collisionBox.getX()) || (rect.getX() < collisionBox.getX() + collisionBox.getWidth() && rect.getX() + rect.getWidth() > collisionBox.getX() + collisionBox.getWidth()) || (rect.getX() < collisionBox.getCenterX() && rect.getX() + rect.getWidth() > collisionBox.getCenterX()))) {
@@ -128,7 +137,7 @@ public class Box {
     }
     public boolean touchingBox(ArrayList<Box> boxes) {
         for (Box box: boxes) {
-            if ((box.getY() + 32 >= collisionBox.getY() + collisionBox.getHeight()) && (box.getY() <= collisionBox.getY() + collisionBox.getHeight()) && ((box.getX() < collisionBox.getX() && box.getX() + 32 > collisionBox.getX()) || (box.getX() < collisionBox.getX() + collisionBox.getWidth() && box.getX() + 32 > collisionBox.getX() + collisionBox.getWidth()))) {
+            if (box != this && (box.getY() + 32 >= collisionBox.getY() + collisionBox.getHeight()) && (box.getY() <= collisionBox.getY() + collisionBox.getHeight()) && ((box.getX() < collisionBox.getX() && box.getX() + 32 > collisionBox.getX()) || (box.getX() < collisionBox.getX() + collisionBox.getWidth() && box.getX() + 32 > collisionBox.getX() + collisionBox.getWidth()) || (collisionBox.getCenterX() <= box.getX() + box.getCollisionBox().getWidth() && collisionBox.getCenterX() >= box.getCollisionBox().x))) {
                 onCollisionBox = box.getCollisionBox();
                 return true;
             }
@@ -179,7 +188,7 @@ public class Box {
         }
     }
     public void update() {
-        if (!touchingPlatform(engine.getLevelLayout().getWalls()) && !playerBelow(engine.getLevelLayout().getAvailableCharacters()) && !touchingBox(engine.getLevelLayout().getBoxes()) && !onTopOfDoor(engine.getLevelLayout().getDoors())) {
+        if (!touchingPlatform(engine.getLevelLayout().getWalls()) && !playerBelow(engine.getLevelLayout().getAvailableCharacters()) && !touchingBox(engine.getLevelLayout().getBoxes()) && !onTopOfDoor(engine.getLevelLayout().getDoors()) && !onOneWayPlatform(engine.getLevelLayout().getOneWayPlatforms())) {
             if (engine.getNecromancer() != null && engine.getNecromancer().getSummon() != null) {
                 if (!skeletonBelow(engine.getNecromancer().getSummon())) {
                     y += velocity;

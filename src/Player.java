@@ -247,11 +247,13 @@ public class Player implements KeyListener{
 
 
     public boolean onOneWayPlatform(ArrayList<Rectangle> oneWayPlatforms) {
-        for (Rectangle platform: oneWayPlatforms) {
-            if (pastY + collisionBox.getHeight() <= platform.y) {
-                if ((platform.getY() + platform.getHeight() >= collisionBox.getY() + collisionBox.getHeight()) && (platform.getY() <= collisionBox.getY() + collisionBox.getHeight()) && ((platform.getX() < collisionBox.getX() && platform.getX() + platform.getWidth() > collisionBox.getX()) || (platform.getX() < collisionBox.getX() + collisionBox.getWidth() && platform.getX() + platform.getWidth() > collisionBox.getX() + collisionBox.getWidth()))) {
-                    onCollisionBox = platform;
-                    return true;
+        if (!down) {
+            for (Rectangle platform : oneWayPlatforms) {
+                if (pastY + collisionBox.getHeight() <= platform.y) {
+                    if ((platform.getY() + platform.getHeight() >= collisionBox.getY() + collisionBox.getHeight()) && (platform.getY() <= collisionBox.getY() + collisionBox.getHeight()) && ((platform.getX() < collisionBox.getX() && platform.getX() + platform.getWidth() > collisionBox.getX()) || (platform.getX() < collisionBox.getX() + collisionBox.getWidth() && platform.getX() + platform.getWidth() > collisionBox.getX() + collisionBox.getWidth()))) {
+                        onCollisionBox = platform;
+                        return true;
+                    }
                 }
             }
         }

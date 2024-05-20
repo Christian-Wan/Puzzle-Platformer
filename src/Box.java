@@ -61,7 +61,7 @@ public class Box {
     }
     public boolean playerBelow(ArrayList<Player> players) {
         for (Player player: players) {
-            if ((player.getY() + player.getCollisionBox().height >= collisionBox.getY() + collisionBox.getHeight()) && (player.getY() <= collisionBox.getY() + collisionBox.getHeight()) && ((player.getCollisionBox().getX() < collisionBox.getX() && player.getCollisionBox().getX() + player.getCollisionBox().getWidth() > collisionBox.getX()) || (player.getCollisionBox().getX() < collisionBox.getX() + collisionBox.getWidth() && player.getCollisionBox().getX() + player.getCollisionBox().getWidth() > collisionBox.getX() + collisionBox.getWidth()) || (collisionBox.getX() < player.getCollisionBox().getCenterX() && collisionBox.getX() + 32 > player.getCollisionBox().getCenterX()))) {
+            if ((player.getY() + player.getCollisionBox().height > collisionBox.getY() + collisionBox.getHeight()) && (player.getY() <= collisionBox.getY() + collisionBox.getHeight()) && ((player.getCollisionBox().getX() < collisionBox.getX() && player.getCollisionBox().getX() + player.getCollisionBox().getWidth() > collisionBox.getX()) || (player.getCollisionBox().getX() < collisionBox.getX() + collisionBox.getWidth() && player.getCollisionBox().getX() + player.getCollisionBox().getWidth() > collisionBox.getX() + collisionBox.getWidth()) || (collisionBox.getX() < player.getCollisionBox().getCenterX() && collisionBox.getX() + 32 > player.getCollisionBox().getCenterX()))) {
                 onCollisionBox = player.getCollisionBox();
                 return true;
             }

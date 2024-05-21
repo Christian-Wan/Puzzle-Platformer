@@ -2,6 +2,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Scanner;
 import java.util.logging.Level;
 
 public class LevelSelectionPanel extends JPanel implements MouseListener {
@@ -10,6 +15,7 @@ public class LevelSelectionPanel extends JPanel implements MouseListener {
     private Rectangle[][] levels;
     private Frame frame;
     private Engine engine;
+    private ArrayList<String> compleatedLevels;
     public LevelSelectionPanel(Frame frame) {
         addMouseListener(this);
         setFocusable(true);
@@ -17,6 +23,12 @@ public class LevelSelectionPanel extends JPanel implements MouseListener {
         backButton = new Rectangle(50, 50, 50, 50);
         createLevels();
         this.frame = frame;
+        Scanner s = null;
+        try {
+            s = new Scanner(new File("level_data"));
+
+        } catch (IOException e) {}
+        compleatedLevels = new ArrayList<String>(Arrays.asList(s.nextLine().split(",")));
     }
 
     public void createLevels() {
@@ -37,13 +49,19 @@ public class LevelSelectionPanel extends JPanel implements MouseListener {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
         g2.drawRect((int) backButton.getX(), (int) backButton.getY(), (int) backButton.getWidth(), (int) backButton.getHeight());
+        int levelNumber = 0;
         for (Rectangle[] row: levels) {
             for (Rectangle level: row) {
                 if (level != null) {
                     g2.drawRect((int) level.getX(), (int) level.getY(), (int) level.getWidth(), (int) level.getHeight());
+                    levelNumber++;
+                    if (compleatedLevels.contains(Integer.toString(levelNumber))) {
+                        g2.drawRect((int) level.getX() + 45, (int) level.getY() - 5, 10, 10);
+                    }
                 }
             }
         }
+
         engine.getTransitions().draw(g2);
 
     }

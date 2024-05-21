@@ -5,6 +5,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -320,6 +323,10 @@ public class LevelLayout {
         else {
             engine.getTransitions().setDesiredLocation("Level Select");
             engine.getTransitions().setIn(true);
+            //maybe works idk
+            try {
+                Files.write(Paths.get("level_data/save"), ",".getBytes(), StandardOpenOption.APPEND);
+            } catch (IOException e) {}
         }
         swapped = false;
     }

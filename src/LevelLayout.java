@@ -23,6 +23,7 @@ public class LevelLayout {
     private ArrayList<Player> availableCharacters;
     private boolean levelDone, swapped, resetting;
     private int characterInControl;
+    private String levelNumber;
     private ArrayList<Box> boxes;
     private HashMap<Opener, Door[]> openersAndDoors;
     private ArrayList<Opener> openers;
@@ -38,6 +39,7 @@ public class LevelLayout {
         levelData = getLevelData(fileName);
         levelDone = false;
         characterInControl = 0;
+        levelNumber = fileName.substring(5);
         swapped = false;
         boxes = new ArrayList<Box>();
         openersAndDoors = new HashMap<Opener, Door[]>();
@@ -291,6 +293,9 @@ public class LevelLayout {
             if (character.isAvailable()) {
                 character.draw(g);
             }
+            if (character.isActive()) {
+                g.drawRect(character.getX() + 5, character.getY() - 10, 5, 5);
+            }
         }
 
 //        System.out.println("QWE");
@@ -325,7 +330,9 @@ public class LevelLayout {
             engine.getTransitions().setIn(true);
             //maybe works idk
             try {
-                Files.write(Paths.get("level_data/save"), ",".getBytes(), StandardOpenOption.APPEND);
+                String save = "," + levelNumber;
+                Files.write(Paths.get("level_data/save"), save.getBytes(), StandardOpenOption.APPEND);
+                engine.getLevelSelectionPanel().updateCompleatedLevels(Integer.parseInt(levelNumber));
             } catch (IOException e) {}
         }
         swapped = false;

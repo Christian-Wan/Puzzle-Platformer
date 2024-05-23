@@ -16,6 +16,7 @@ public class LevelSelectionPanel extends JPanel implements MouseListener {
     private Frame frame;
     private Engine engine;
     private ArrayList<String> compleatedLevels;
+    private ArrayList<Integer> compleatedLevelsDuringSession;
     public LevelSelectionPanel(Frame frame) {
         addMouseListener(this);
         setFocusable(true);
@@ -23,12 +24,14 @@ public class LevelSelectionPanel extends JPanel implements MouseListener {
         backButton = new Rectangle(50, 50, 50, 50);
         createLevels();
         this.frame = frame;
+        compleatedLevelsDuringSession = new ArrayList<Integer>();
         Scanner s = null;
         try {
-            s = new Scanner(new File("level_data"));
+            s = new Scanner(new File("level_data/save"));
 
         } catch (IOException e) {}
         compleatedLevels = new ArrayList<String>(Arrays.asList(s.nextLine().split(",")));
+        s.close();
     }
 
     public void createLevels() {
@@ -55,7 +58,7 @@ public class LevelSelectionPanel extends JPanel implements MouseListener {
                 if (level != null) {
                     g2.drawRect((int) level.getX(), (int) level.getY(), (int) level.getWidth(), (int) level.getHeight());
                     levelNumber++;
-                    if (compleatedLevels.contains(Integer.toString(levelNumber))) {
+                    if (compleatedLevels.contains(Integer.toString(levelNumber)) || compleatedLevelsDuringSession.contains(levelNumber)) {
                         g2.drawRect((int) level.getX() + 45, (int) level.getY() - 5, 10, 10);
                     }
                 }
@@ -111,5 +114,9 @@ public class LevelSelectionPanel extends JPanel implements MouseListener {
     @Override
     public void mouseExited(MouseEvent e) {
 
+    }
+
+    public void updateCompleatedLevels(Integer level) {
+        compleatedLevelsDuringSession.add(level);
     }
 }

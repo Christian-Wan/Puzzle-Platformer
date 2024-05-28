@@ -30,7 +30,6 @@ public class Engine {
     }
 
     public void newLevelLayout(int level) {
-        levelLayout = null;
         levelLayout = new LevelLayout(this, "level" + level);
     }
 

@@ -86,6 +86,11 @@ public class Player implements KeyListener{
         //Physics
         velocityTimer++;
 
+        if (!active && !(this instanceof Skeleton)) {
+            left = false;
+            right = false;
+        }
+
         touchingSpike(engine.getLevelLayout().getSpikes());
         if (reachEnd(engine.getPortal().getCollision())) {
             available = false;
@@ -769,7 +774,7 @@ public class Player implements KeyListener{
 
                     break;
                 case KeyEvent.VK_Q:
-//                    System.out.println("ASD" + this);
+                    System.out.println("ASD" + this);
                     if (!inAir) {
                         frameNumber = 0;
                     }

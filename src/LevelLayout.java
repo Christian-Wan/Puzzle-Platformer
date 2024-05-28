@@ -326,14 +326,13 @@ public class LevelLayout {
 //        System.out.println("LKJ");
         }
         else {
-            engine.getTransitions().setDesiredLocation("Level Select");
-            engine.getTransitions().setIn(true);
-            //maybe works idk
             try {
                 String save = "," + levelNumber;
                 Files.write(Paths.get("level_data/save"), save.getBytes(), StandardOpenOption.APPEND);
                 engine.getLevelSelectionPanel().updateCompleatedLevels(Integer.parseInt(levelNumber));
             } catch (IOException e) {}
+            engine.getTransitions().setDesiredLocation("Level Select");
+            engine.getTransitions().setIn(true);
         }
         swapped = false;
     }

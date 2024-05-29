@@ -35,7 +35,7 @@ public class LevelSelectionPanel extends JPanel implements MouseListener {
     }
 
     public void createLevels() {
-        levels = new Rectangle[3][5];
+        levels = new Rectangle[4][5];
         levels[0][0] = new Rectangle(50, 150, 50, 50);
         levels[0][1] = new Rectangle(150, 150, 50, 50);
         levels[0][2] = new Rectangle(250, 150, 50, 50);
@@ -44,6 +44,14 @@ public class LevelSelectionPanel extends JPanel implements MouseListener {
         levels[1][0] = new Rectangle(50, 250, 50, 50);
         levels[1][1] = new Rectangle(150, 250, 50, 50);
         levels[1][2] = new Rectangle(250, 250, 50, 50);
+        levels[1][3] = new Rectangle(350, 250, 50, 50);
+        levels[1][4] = new Rectangle(450, 250, 50, 50);
+        levels[2][0] = new Rectangle(50, 350, 50, 50);
+        levels[2][1] = new Rectangle(150, 350, 50, 50);
+        levels[2][2] = new Rectangle(250, 350, 50, 50);
+        levels[2][3] = new Rectangle(350, 350, 50, 50);
+        levels[2][4] = new Rectangle(450, 350, 50, 50);
+        levels[3][0] = new Rectangle(50, 450, 50, 50);
     }
     public void update() {
         engine.getTransitions().update();
@@ -80,7 +88,7 @@ public class LevelSelectionPanel extends JPanel implements MouseListener {
                 engine.getTransitions().setIn(true);
             }
 
-            for (int r = 0; r < 3; r++) {
+            for (int r = 0; r < 4; r++) {
                 for (int c = 0; c < 5; c ++) {
 
                     if (levels[r][c] != null) {

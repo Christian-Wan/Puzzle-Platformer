@@ -13,12 +13,13 @@ public class Door {
 
     private Engine engine;
     private int number;
-    private boolean buttonOpen, keyOpen, wasOpen;
+    private boolean buttonOpen, keyOpen, wasOpen, innateOn;
     private Rectangle collisionBox, location;
     private BufferedImage door;
-    public Door(Engine engine, String doorNumber, int x , int y) {
+    public Door(Engine engine, String doorNumber, int x , int y, boolean on) {
         this.engine = engine;
         number = Integer.parseInt(doorNumber.substring(1));
+        innateOn = on;
         keyOpen = false;
         buttonOpen = false;
         collisionBox = new Rectangle(x, y, 32, 32);
@@ -77,47 +78,85 @@ public class Door {
     }
 
     public void update() {
-        if (keyOpen || buttonOpen) {
-            collisionBox.setBounds(collisionBox.x, collisionBox.y, 0, 0);
-            wasOpen = true;
-        }
-        else {
-            if (wasOpen) {
-                System.out.println("Touching player: " + touchingPlayer(engine.getLevelLayout().getAvailableCharacters()));
-                System.out.println(engine.getLevelLayout().getAvailableCharacters());
-                if (!touchingPlayer(engine.getLevelLayout().getAvailableCharacters()) && !touchingBox(engine.getLevelLayout().getBoxes())) {
-                    if (engine.getNecromancer() != null && engine.getNecromancer().getSummon() != null) {
-                        if (!touchingSummon(engine.getNecromancer().getSummon())) {
+        if (innateOn) {
+            if (keyOpen || buttonOpen) {
+                collisionBox.setBounds(collisionBox.x, collisionBox.y, 0, 0);
+                wasOpen = true;
+            } else {
+                if (wasOpen) {
+                    System.out.println("Touching player: " + touchingPlayer(engine.getLevelLayout().getAvailableCharacters()));
+                    System.out.println(engine.getLevelLayout().getAvailableCharacters());
+                    if (!touchingPlayer(engine.getLevelLayout().getAvailableCharacters()) && !touchingBox(engine.getLevelLayout().getBoxes())) {
+                        if (engine.getNecromancer() != null && engine.getNecromancer().getSummon() != null) {
+                            if (!touchingSummon(engine.getNecromancer().getSummon())) {
+                                collisionBox.setBounds(collisionBox.x, collisionBox.y, 32, 32);
+                                wasOpen = false;
+                            }
+                        } else {
                             collisionBox.setBounds(collisionBox.x, collisionBox.y, 32, 32);
                             wasOpen = false;
                         }
+                    } else {
+                        System.out.println("Problem 1");
                     }
-                    else {
-                        collisionBox.setBounds(collisionBox.x, collisionBox.y, 32, 32);
-                        wasOpen = false;
-                    }
-                }
-                else {
-                    System.out.println("Problem 1");
-                }
 
+                } else {
+                    collisionBox.setBounds(collisionBox.x, collisionBox.y, 32, 32);
+                }
+            }
+        }
+        else {
+            if (keyOpen || buttonOpen) {
+                if (wasOpen) {
+                    System.out.println("Touching player: " + touchingPlayer(engine.getLevelLayout().getAvailableCharacters()));
+                    System.out.println(engine.getLevelLayout().getAvailableCharacters());
+                    if (!touchingPlayer(engine.getLevelLayout().getAvailableCharacters()) && !touchingBox(engine.getLevelLayout().getBoxes())) {
+                        if (engine.getNecromancer() != null && engine.getNecromancer().getSummon() != null) {
+                            if (!touchingSummon(engine.getNecromancer().getSummon())) {
+                                collisionBox.setBounds(collisionBox.x, collisionBox.y, 32, 32);
+                                System.out.println("Set Something");
+                                wasOpen = false;
+                            }
+                        } else {
+                            collisionBox.setBounds(collisionBox.x, collisionBox.y, 32, 32);
+                            System.out.println("Set Something");
+                            wasOpen = false;
+                        }
+                    } else {
+                        System.out.println("Problem 1");
+                    }
+
+                } else {
+                    collisionBox.setBounds(collisionBox.x, collisionBox.y, 32, 32);
+                    System.out.println("Set Something");
+                }
             }
             else {
-                collisionBox.setBounds(collisionBox.x, collisionBox.y, 32, 32);
+                collisionBox.setBounds(collisionBox.x, collisionBox.y, 0, 0);
+                wasOpen = true;
             }
         }
     }
 
     public void draw(Graphics2D g) {
-        if (keyOpen || buttonOpen || wasOpen) {
-            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .25f));
+        if (innateOn) {
+            if (keyOpen || buttonOpen || wasOpen) {
+                g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .25f));
+            } else {
+                g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+            }
         }
         else {
-            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+            if (keyOpen || buttonOpen) {
+                g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+            } else {
+                g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .25f));
+            }
         }
         g.drawImage(door, collisionBox.x, collisionBox.y, 32, 32, null);
         g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
-        g.drawRect(collisionBox.x, collisionBox.y, 32, 32);
+        g.setColor(Color.GREEN);
+        g.drawRect(collisionBox.x, collisionBox.y, collisionBox.width, collisionBox.height);
 
     }
 

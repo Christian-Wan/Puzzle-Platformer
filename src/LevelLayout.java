@@ -80,10 +80,10 @@ public class LevelLayout {
         Graphics g = combined.getGraphics();
         walls = new ArrayList<Rectangle>();
         //make sure to put the things that won't be counted as walls here
-        String nonWallTiles = "pzekb/[|n^<>-";
+        String nonWallTiles = "pzekb/[{}n^<>-";
         for (int r = 0; r < 27; r++) {
             for (int c = 0; c < 47; c++) {
-                if (!nonWallTiles.contains(levelData[r][c]) && !levelData[r][c].contains("[") && !levelData[r][c].contains("/") && !levelData[r][c].contains("|")) {
+                if (!nonWallTiles.contains(levelData[r][c]) && !levelData[r][c].contains("[") && !levelData[r][c].contains("/") && !levelData[r][c].contains("}") && !levelData[r][c].contains("{")) {
                     //make sure that this has the right values
                     walls.add(new Rectangle(c * 32, r * 32, 32, 32));
                 }
@@ -172,8 +172,11 @@ public class LevelLayout {
                 else if (levelData[r][c].contains("[")) {
                     openers.add(new Button(engine, levelData[r][c], c * 32 + 8, r * 32 + 24));
                 }
-                else if (levelData[r][c].contains("|")) {
-                    doors.add(new Door(engine, levelData[r][c],c * 32, r * 32));
+                else if (levelData[r][c].contains("}")) {
+                    doors.add(new Door(engine, levelData[r][c],c * 32, r * 32, true));
+                }
+                else if (levelData[r][c].contains("{")) {
+                    doors.add(new Door(engine, levelData[r][c], c * 32, r * 32, false));
                 }
             }
         }

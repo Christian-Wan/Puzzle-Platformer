@@ -309,6 +309,7 @@ public class Player implements KeyListener{
         for (Door door: doors) {
             if ((door.getCollisionBox().getY() + door.getCollisionBox().getHeight() >= collisionBox.getY() + collisionBox.getHeight()) && (door.getCollisionBox().getY() <= collisionBox.getY() + collisionBox.getHeight()) && ((door.getCollisionBox().getX() < collisionBox.getX() && door.getCollisionBox().getX() + door.getCollisionBox().getWidth() > collisionBox.getX()) || (door.getCollisionBox().getX() < collisionBox.getX() + collisionBox.getWidth() && door.getCollisionBox().getX() + door.getCollisionBox().getWidth() > collisionBox.getX() + collisionBox.getWidth()))) {
                 onCollisionBox = door.getCollisionBox();
+                System.out.println("On Top of DOor");
                 return true;
             }
         }

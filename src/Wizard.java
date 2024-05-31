@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 
 public class Wizard extends Player {
 
@@ -39,7 +40,16 @@ public class Wizard extends Player {
     public void draw(Graphics2D g) {
         super.draw(g);
         if (abilityActive) {
-            g.drawRect(storedX, storedY, 10, 10);
+            BufferedImage image = null;
+            if (super.isFacingRight()) {
+                image = super.getStandR().getSubimage(24, 21, 15, 23);
+            }
+            else {
+                image = super.getStandL().getSubimage(24, 21, 15, 23);
+            }
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .5f));
+            g.drawImage(image, storedX, storedY, 30, 46, null);
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
         }
     }
 

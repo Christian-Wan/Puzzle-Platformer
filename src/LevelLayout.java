@@ -15,14 +15,14 @@ import java.util.logging.Level;
 
 public class LevelLayout {
 
-    private BufferedImage topLeftCorner, topRightCorner, bottomLeftCorner, bottomRightCorner, upWall, leftWall, rightWall, downWall, darkness, topLeftDarkness, topRightDarkness, bottomLeftDarkness, bottomRightDarkness;
+    private BufferedImage topLeftCorner, topRightCorner, bottomLeftCorner, bottomRightCorner, upWall, leftWall, rightWall, downWall, darkness, topLeftDarkness, topRightDarkness, bottomLeftDarkness, bottomRightDarkness, spike, arrow, oneWayLeft, oneWayMiddle, oneWayRight;
     private BufferedImage combined;
     private ArrayList<Rectangle> walls, oneWayPlatforms;
     private String[][] levelData;
     private Engine engine;
     private ArrayList<Player> availableCharacters;
     private boolean levelDone, swapped, resetting;
-    private int characterInControl;
+    private int characterInControl, arrowCounter;
     private String levelNumber;
     private ArrayList<Box> boxes;
     private HashMap<Opener, Door[]> openersAndDoors;
@@ -35,6 +35,7 @@ public class LevelLayout {
     public LevelLayout(Engine engine, String fileName) {
         this.engine = engine;
         characterInControl = 0;
+        arrowCounter = 0;
         availableCharacters = new ArrayList<Player>();
         levelData = getLevelData(fileName);
         levelDone = false;
@@ -74,6 +75,13 @@ public class LevelLayout {
         topRightDarkness = tileset.getSubimage(208, 16, 32, 32);
         bottomLeftDarkness = tileset.getSubimage(160, 64, 32, 32);
         bottomRightDarkness = tileset.getSubimage(208, 64, 32, 32);
+        oneWayLeft = tileset.getSubimage(496, 16, 32, 6);
+        oneWayMiddle = tileset.getSubimage(496, 48, 32, 6);
+        oneWayRight = tileset.getSubimage(496, 80, 32, 6);
+        try {
+            spike = ImageIO.read(new File("image/Level_Assets/Spike.png")).getSubimage(16, 41,32, 7);
+            arrow = ImageIO.read(new File("image/Level_Assets/Arrow.png")).getSubimage(25, 19,14, 23);
+        } catch (IOException e) {}
     }
 
     public void setWalls() {
@@ -128,7 +136,7 @@ public class LevelLayout {
                         g.drawImage(bottomRightDarkness, c * 32, r * 32, 32, 32, null);
                         break;
                     case "p":
-                        engine.newWizard(c * 32 + 14, r * 32 + 20);
+                        engine.newWizard(c * 32 + 2, r * 32 + 20);
                         availableCharacters.add(engine.getWizard());
                         break;
                     case "e":
@@ -136,35 +144,33 @@ public class LevelLayout {
                         engine.getPortal().setY(r * 32 - 5);
                         break;
                     case "k":
-                        engine.newKnight(c * 32 + 14, r * 32 + 20);
+                        engine.newKnight(c * 32 + 2, r * 32 + 20);
                         availableCharacters.add(engine.getKnight());
                         break;
                     case "b":
-                        boxes.add(new Box(engine, c * 32 + 22, r * 32));
+                        boxes.add(new Box(engine, c * 32, r * 32));
                         System.out.println(boxes);
                         break;
                     case "n":
-                        engine.newNecromancer(c * 32 + 14, r * 32 + 20);
+                        engine.newNecromancer(c * 32 + 2, r * 32 + 20);
                         availableCharacters.add(engine.getNecromancer());
                         break;
                     case "^":
                         spikes.add(new Spike (c * 32, r * 32 + 28));
-                        g.setColor(Color.PINK);
-                        g.drawRect(c * 32, r * 32 + 28, 32, 5);
-                        g.setColor(Color.BLACK);
+                        g.drawImage(spike, c * 32, r * 32 + 25, 32 ,7, null);
                         break;
-                    case "<", "-", ">":
+                    case "<":
                         oneWayPlatforms.add(new Rectangle(c * 32, r * 32 + 16, 32, 5));
-                        g.setColor(Color.GREEN);
-                        g.drawRect(c * 32, r * 32 + 16, 32, 5);
-                        g.setColor(Color.BLACK);
+                        g.drawImage(oneWayLeft, c * 32, r * 32 + 16, 32, 12, null);
                         break;
-//                    case "-":
-//                        oneWayPlatforms.add(new OneWayPlatform(c * 32, r * 32 + 16, 1));
-//                        break;
-//                    case ">":
-//                        oneWayPlatforms.add(new OneWayPlatform(c * 32, r * 32 + 16, 1));
-//                        break;
+                    case "-":
+                        oneWayPlatforms.add(new Rectangle(c * 32, r * 32 + 16, 32, 5));
+                        g.drawImage(oneWayMiddle, c * 32, r * 32 + 16, 32, 12, null);
+                        break;
+                    case ">":
+                        oneWayPlatforms.add(new Rectangle(c * 32, r * 32 + 16, 32, 5));
+                        g.drawImage(oneWayRight, c * 32, r * 32 + 16, 32, 12, null);
+                        break;
                 }
                 if (levelData[r][c].contains("/")) {
                     openers.add(new Key(engine, levelData[r][c], c * 32 + 8, r * 32 + 9));
@@ -221,14 +227,14 @@ public class LevelLayout {
         for (int r = 0; r < 27; r++) {
             for (int c = 0; c < 47; c++) {
                 if (characters.contains(levelData[r][c])) {
-                    availableCharacters.get(counter).setX(c * 32 + 14);
+                    availableCharacters.get(counter).setX(c * 32 + 2);
                     availableCharacters.get(counter).setY(r * 32 + 20);
                     availableCharacters.get(counter).setAvailable(true);
                     resetting = true;
                     counter++;
                 }
                 else if (levelData[r][c].equals("b")) {
-                    boxes.add(new Box(engine, c * 32 + 22, r * 32));
+                    boxes.add(new Box(engine, c * 32, r * 32));
                 }
                 for (Opener opener: openers) {
                     opener.setOpening(false);
@@ -273,6 +279,7 @@ public class LevelLayout {
 
     public void draw(Graphics2D g) {
         engine.getPlayBackground().draw(g);
+        arrowCounter++;
         g.drawImage(combined, 0, 0, null);
         g.setColor(Color.BLUE);
         for (int i = 0; i < walls.size(); i++) {
@@ -296,8 +303,15 @@ public class LevelLayout {
             if (character.isAvailable()) {
                 character.draw(g);
             }
-            if (character.isActive()) {
-                g.drawRect(character.getX() + 5, character.getY() - 10, 5, 5);
+        }
+        Player current = availableCharacters.get(characterInControl);
+        if (arrowCounter < 20) {
+            g.drawImage(arrow, current.getX() + 13, current.getY() - 15, 7, 12, null);
+        }
+        else if (arrowCounter <= 40) {
+            g.drawImage(arrow, current.getX() + 13, current.getY() - 17, 7, 12, null);
+            if (arrowCounter == 40) {
+                arrowCounter = 0;
             }
         }
 

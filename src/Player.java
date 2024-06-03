@@ -247,7 +247,7 @@ public class Player implements KeyListener{
         }
         g.drawImage(image, x, y, 15 * SCALE, 23 * SCALE, null);
         g.setColor(Color.BLUE);
-        g.drawRect(collisionBox.x, collisionBox.y, collisionBox.width, collisionBox.height);
+//        g.drawRect(collisionBox.x, collisionBox.y, collisionBox.width, collisionBox.height);
     }
 
 
@@ -298,7 +298,7 @@ public class Player implements KeyListener{
 
     public boolean wallOnRight(ArrayList<Rectangle> rectangles) {
         for (Rectangle rect: rectangles) {
-            if ((rect.getX() <= collisionBox.getX() + collisionBox.getWidth()) && (rect.getX() + rect.getWidth() >= collisionBox.getX() + collisionBox.getWidth()) && ((rect.getY() < collisionBox.getY() && rect.getY() + rect.getHeight() > collisionBox.getY()) || (rect.getY() < collisionBox.getY() + collisionBox.getHeight() && rect.getY() + rect.getHeight() > collisionBox.getY() + collisionBox.getHeight()) || (rect.getY() < collisionBox.getCenterY() && rect.getY() + rect.getHeight() > collisionBox.getCenterY()))) {
+            if ((rect.getX() - 2 + rect.getWidth() >= collisionBox.getX() + collisionBox.getWidth()) && (rect.getX() - 2 <= collisionBox.getX() + collisionBox.getWidth()) && ((rect.getY() <= collisionBox.getY() && rect.getY() + rect.getHeight() > collisionBox.getY()) || (rect.getY() < (collisionBox.getY() + collisionBox.getHeight()) && rect.getY() + rect.getHeight() >= collisionBox.getY() + collisionBox.getHeight()) || (rect.getY() < collisionBox.getCenterY() && rect.getY() + rect.getHeight() > collisionBox.getCenterY()))) {
                 return true;
             }
         }

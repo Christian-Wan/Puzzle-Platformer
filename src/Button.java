@@ -53,6 +53,7 @@ public class Button extends Opener {
             super.setOpening(true);
             for (Door door: super.getEngine().getLevelLayout().getOpenersAndDoors().get(this)) {
                 door.setButtonOpen(true);
+                System.out.println("Working");
             }
         }
         //This if statement is just for the necromancer's skeleton
@@ -65,7 +66,9 @@ public class Button extends Opener {
         else {
             super.setOpening(false);
             for (Door door: super.getEngine().getLevelLayout().getOpenersAndDoors().get(this)) {
-                door.setButtonOpen(false);
+                if (!door.isOpenedThisFrame()) {
+                    door.setButtonOpen(false);
+                }
             }
         }
     }

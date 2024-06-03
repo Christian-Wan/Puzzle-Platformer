@@ -231,6 +231,9 @@ public class LevelLayout {
                     availableCharacters.get(counter).setY(r * 32 + 20);
                     availableCharacters.get(counter).setAvailable(true);
                     resetting = true;
+                    if (availableCharacters.get(counter) instanceof Necromancer) {
+                        ((Necromancer) availableCharacters.get(counter)).nullSummon();
+                    }
                     counter++;
                 }
                 else if (levelData[r][c].equals("b")) {
@@ -310,7 +313,7 @@ public class LevelLayout {
         }
         else if (arrowCounter <= 40) {
             g.drawImage(arrow, current.getX() + 13, current.getY() - 17, 7, 12, null);
-            if (arrowCounter == 40) {
+            if (arrowCounter >= 40) {
                 arrowCounter = 0;
             }
         }
@@ -320,6 +323,7 @@ public class LevelLayout {
 
     public void update() {
         if (!levelDone) {
+//            System.out.println(openers.get(1).getNumber());
             for (Player character : availableCharacters) {
                 if (character.isAvailable()) {
                     character.update();

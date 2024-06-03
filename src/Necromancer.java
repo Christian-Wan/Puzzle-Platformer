@@ -60,6 +60,9 @@ public class Necromancer extends Player {
     public Skeleton getSummon() {
         return summon;
     }
+    public void nullSummon() {
+        summon = null;
+    }
 
     public boolean reachEnd(Rectangle portal) {
         if (super.reachEnd(portal)) {

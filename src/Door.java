@@ -13,7 +13,7 @@ public class Door {
 
     private Engine engine;
     private int number;
-    private boolean buttonOpen, keyOpen, wasOpen, innateOn;
+    private boolean buttonOpen, keyOpen, wasOpen, innateOn, openedThisFrame;
     private Rectangle collisionBox, location;
     private BufferedImage door;
     public Door(Engine engine, String doorNumber, int x , int y, boolean on) {
@@ -25,6 +25,7 @@ public class Door {
         collisionBox = new Rectangle(x, y, 32, 32);
         location = new Rectangle(x, y, 32, 32);
         wasOpen = false;
+        openedThisFrame = false;
         try {
             if (number == 1) {
                 door = ImageIO.read(new File("image/Level_Assets/Walls_Tileset.png")).getSubimage(160, 112, 32, 32);
@@ -44,6 +45,7 @@ public class Door {
     }
     public void setButtonOpen(Boolean open) {
         buttonOpen = open;
+        openedThisFrame = true;
     }
 
     public Rectangle getCollisionBox() {
@@ -78,6 +80,7 @@ public class Door {
     }
 
     public void update() {
+        openedThisFrame = false;
         if (innateOn) {
             if (keyOpen || buttonOpen) {
                 collisionBox.setBounds(collisionBox.x, collisionBox.y, 0, 0);
@@ -166,5 +169,17 @@ public class Door {
 
     public int getY() {
         return collisionBox.y;
+    }
+
+    public boolean isButtonOpen() {
+        return buttonOpen;
+    }
+
+    public boolean isKeyOpen() {
+        return keyOpen;
+    }
+
+    public boolean isOpenedThisFrame() {
+        return openedThisFrame;
     }
 }

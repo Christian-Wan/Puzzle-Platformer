@@ -1,7 +1,9 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,6 +16,7 @@ public class LevelSelectionPanel extends JPanel implements MouseListener {
     private Rectangle backButton;
     private Rectangle[][] levels;
     private Frame frame;
+    private BufferedImage image, star;
     private Engine engine;
     private ArrayList<String> compleatedLevels;
     private ArrayList<Integer> compleatedLevelsDuringSession;
@@ -25,37 +28,42 @@ public class LevelSelectionPanel extends JPanel implements MouseListener {
         createLevels();
         this.frame = frame;
         compleatedLevelsDuringSession = new ArrayList<Integer>();
+        try {
+            image = ImageIO.read(new File("image/Level_Selection.png"));
+            star = ImageIO.read(new File("image/Star.png")).getSubimage(24, 22, 16, 16);
+        } catch (IOException e) {}
         Scanner s = null;
         try {
             s = new Scanner(new File("level_data/save"));
-
         } catch (IOException e) {}
         compleatedLevels = new ArrayList<String>(Arrays.asList(s.nextLine().split(",")));
         s.close();
     }
 
     public void createLevels() {
-        levels = new Rectangle[4][5];
-        levels[0][0] = new Rectangle(50, 150, 50, 50);
-        levels[0][1] = new Rectangle(150, 150, 50, 50);
-        levels[0][2] = new Rectangle(250, 150, 50, 50);
-        levels[0][3] = new Rectangle(350, 150, 50, 50);
-        levels[0][4] = new Rectangle(450, 150, 50, 50);
-        levels[1][0] = new Rectangle(50, 250, 50, 50);
-        levels[1][1] = new Rectangle(150, 250, 50, 50);
-        levels[1][2] = new Rectangle(250, 250, 50, 50);
-        levels[1][3] = new Rectangle(350, 250, 50, 50);
-        levels[1][4] = new Rectangle(450, 250, 50, 50);
-        levels[2][0] = new Rectangle(50, 350, 50, 50);
-        levels[2][1] = new Rectangle(150, 350, 50, 50);
-        levels[2][2] = new Rectangle(250, 350, 50, 50);
-        levels[2][3] = new Rectangle(350, 350, 50, 50);
-        levels[2][4] = new Rectangle(450, 350, 50, 50);
-        levels[3][0] = new Rectangle(50, 450, 50, 50);
-        levels[3][1] = new Rectangle(150, 450, 50, 50);
-        levels[3][2] = new Rectangle(250, 450, 50, 50);
-        levels[3][3] = new Rectangle(350, 450, 50, 50);
-        levels[3][4] = new Rectangle(450, 450, 50, 50);
+        levels = new Rectangle[5][8];
+        levels[0][0] = new Rectangle(188, 160, 75, 75);
+        levels[0][1] = new Rectangle(338, 160, 75, 75);
+        levels[0][2] = new Rectangle(488, 160, 75, 75);
+        levels[0][3] = new Rectangle(638, 160, 75, 75);
+        levels[0][4] = new Rectangle(788, 160, 75, 75);
+        levels[0][5] = new Rectangle(938, 160, 75, 75);
+        levels[0][6] = new Rectangle(1088, 160, 75, 75);
+        levels[0][7] = new Rectangle(1238, 160, 75, 75);
+        levels[1][0] = new Rectangle(188, 310, 75, 75);
+        levels[1][1] = new Rectangle(338, 310, 75, 75);
+        levels[1][2] = new Rectangle(488, 310, 75, 75);
+        levels[1][3] = new Rectangle(638, 310, 75, 75);
+        levels[1][4] = new Rectangle(788, 310, 75, 75);
+        levels[1][5] = new Rectangle(938, 310, 75, 75);
+        levels[1][6] = new Rectangle(1088, 310, 75, 75);
+        levels[1][7] = new Rectangle(1238, 310, 75, 75);
+        levels[2][0] = new Rectangle(188, 460, 75, 75);
+        levels[2][1] = new Rectangle(338, 460, 75, 75);
+        levels[2][2] = new Rectangle(488, 460, 75, 75);
+        levels[2][3] = new Rectangle(638, 460, 75, 75);
+
+
 
 
     }
@@ -65,15 +73,17 @@ public class LevelSelectionPanel extends JPanel implements MouseListener {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
+        g2.drawImage(image, 0, 0, 1500, 900, null);
         g2.drawRect((int) backButton.getX(), (int) backButton.getY(), (int) backButton.getWidth(), (int) backButton.getHeight());
         int levelNumber = 0;
         for (Rectangle[] row: levels) {
             for (Rectangle level: row) {
                 if (level != null) {
+                    g2.setColor(Color.PINK);
                     g2.drawRect((int) level.getX(), (int) level.getY(), (int) level.getWidth(), (int) level.getHeight());
                     levelNumber++;
                     if (compleatedLevels.contains(Integer.toString(levelNumber)) || compleatedLevelsDuringSession.contains(levelNumber)) {
-                        g2.drawRect((int) level.getX() + 45, (int) level.getY() - 5, 10, 10);
+                        g2.drawImage(star, (int) level.getX() + 67, (int) level.getY() - 8, 16, 16, null);
                     }
                 }
             }

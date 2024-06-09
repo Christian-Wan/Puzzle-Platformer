@@ -489,6 +489,7 @@ public class Player implements KeyListener{
             right = false;
             up = false;
             frameNumber = 0;
+            engine.getSoundControl().playPortal();
             return true;
         }
         return false;
@@ -740,6 +741,7 @@ public class Player implements KeyListener{
                         timeInAir = 0;
                         velocity = -3;
                         velocityTimer = 0;
+                        engine.getSoundControl().playJump();
                     }
                     break;
                 case KeyEvent.VK_LEFT:

@@ -73,15 +73,18 @@ public class MainMenuPanel extends JPanel implements MouseListener {
         if (e.getButton() == 1) {
             if (!settingsOpen) {
                 if (playButton.contains(clicked)) {
+                    engine.getSoundControl().playClick();
                     engine.getTransitions().setDesiredLocation("Level Select");
                     engine.getTransitions().setIn(true);
                 }
                 else if (settingsButton.contains(clicked)) {
+                    engine.getSoundControl().playClick();
                     settingsOpen = true;
                 }
             }
             else {
                 if (engine.getSoundControl().getClose().contains(clicked)) {
+                    engine.getSoundControl().playClick();
                     settingsOpen = false;
                 }
             }
@@ -95,10 +98,12 @@ public class MainMenuPanel extends JPanel implements MouseListener {
             if (settingsOpen) {
                 if (!firstPress) {
                     if (engine.getSoundControl().getSfxSlider().contains(clicked)) {
+                        engine.getSoundControl().playClick();
                         pressedSfxSlider = true;
                         engine.getSoundControl().changeSfxSlider(clicked, firstPress);
                     }
                     else if (engine.getSoundControl().getMusicSlider().contains(clicked)) {
+                        engine.getSoundControl().playClick();
                         pressedMusicSlider = true;
                         engine.getSoundControl().changeMusicSlider(clicked, firstPress);
                     }

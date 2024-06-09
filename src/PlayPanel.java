@@ -53,6 +53,7 @@ public class PlayPanel extends JPanel implements MouseListener {
         if (e.getButton() == 1) {
             System.out.println("ASKJDH");
             if (backButton.contains(clicked)) {
+                engine.getSoundControl().playClick();
                 engine.getTransitions().setDesiredLocation("Level Select");
                 engine.getTransitions().setIn(true);
             }

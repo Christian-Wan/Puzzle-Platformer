@@ -101,6 +101,7 @@ public class LevelSelectionPanel extends JPanel implements MouseListener {
 
         if (e.getButton() == 1) {
             if (backButton.contains(clicked)) {
+                engine.getSoundControl().playClick();
                 engine.getTransitions().setDesiredLocation("Main Menu");
                 engine.getTransitions().setIn(true);
             }
@@ -111,6 +112,7 @@ public class LevelSelectionPanel extends JPanel implements MouseListener {
                     if (levels[r][c] != null) {
                         if (levels[r][c].contains(clicked)) {
                             //Row * 5  + Column + 1
+                            engine.getSoundControl().playClick();
                             engine.newLevelLayout(r * 8 + c + 1);
                             engine.getTransitions().setDesiredLocation("Play");
                             engine.getTransitions().setIn(true);

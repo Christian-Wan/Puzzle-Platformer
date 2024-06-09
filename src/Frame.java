@@ -12,7 +12,11 @@ public class Frame extends JFrame implements Runnable{
     private Engine engine;
     private Thread windowThread;
     private String activePanel;
+
     public Frame() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
+        this.setTitle("Skill Check");
+        ImageIcon img = new ImageIcon("image/Icon.png");
+        this.setIconImage(img.getImage());
         engine = new Engine(this);
         engine.makePanels();
         activePanel = "Main Menu";

@@ -12,9 +12,11 @@ public class Button extends Opener {
     //Button is a key is hashmap
 
     private BufferedImage up, down;
+    private boolean playedSound;
     public Button(Engine engine, String buttonNumber, int x, int y) {
         super(engine, buttonNumber);
         super.setCollisionBox(new Rectangle(x, y, 16, 8));
+        playedSound = false;
         try {
             switch (super.getNumber()) {
                 case 1:
@@ -44,6 +46,7 @@ public class Button extends Opener {
     public boolean touchingSummon(Skeleton skeleton) {
         if (skeleton != null) {
             if (skeleton.getCollisionBox().intersects(getCollisionBox())) {
+
                 return true;
             }
         }
@@ -52,6 +55,10 @@ public class Button extends Opener {
 
     public void update() {
         if (super.touchingPlayer(super.getEngine().getLevelLayout().getAvailableCharacters()) || touchingBox(super.getEngine().getLevelLayout().getBoxes())) {
+            if (!playedSound) {
+                super.getEngine().getSoundControl().playButton();
+                playedSound = true;
+            }
             super.setOpening(true);
             for (Door door: super.getEngine().getLevelLayout().getOpenersAndDoors().get(this)) {
                 door.setButtonOpen(true);
@@ -60,12 +67,17 @@ public class Button extends Opener {
         }
         //This if statement is just for the necromancer's skeleton
         else if (super.getEngine().getNecromancer() != null && super.getEngine().getNecromancer().getSummon() != null && touchingSummon(super.getEngine().getNecromancer().getSummon())) {
+            if (!playedSound) {
+                super.getEngine().getSoundControl().playButton();
+                playedSound = true;
+            }
             super.setOpening(true);
             for (Door door: super.getEngine().getLevelLayout().getOpenersAndDoors().get(this)) {
                 door.setButtonOpen(true);
             }
         }
         else {
+            playedSound = false;
             super.setOpening(false);
             for (Door door: super.getEngine().getLevelLayout().getOpenersAndDoors().get(this)) {
                 if (!door.isOpenedThisFrame()) {

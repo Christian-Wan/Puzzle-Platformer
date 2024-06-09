@@ -120,7 +120,7 @@ public class Box {
 
     public boolean doorOnLeft(ArrayList<Door> doors, int x) {
         for (Door door: doors) {
-            if ((door.getX() + door.getCollisionBox().width > x) && (door.getX() <= x) && ((door.getY() < collisionBox.getY() && door.getY() + door.getCollisionBox().height > collisionBox.getY()) || (door.getY() < (collisionBox.getY() + collisionBox.getHeight()) && door.getY() + door.getCollisionBox().height > collisionBox.getY()  + collisionBox.getHeight()) || (door.getY() < collisionBox.getCenterY() && door.getY() + door.getCollisionBox().getHeight() > collisionBox.getCenterY()))) {
+            if ((door.getX() + door.getCollisionBox().width >= x) && (door.getX() <= x) && ((door.getY() < collisionBox.getY() && door.getY() + door.getCollisionBox().height > collisionBox.getY()) || (door.getY() < (collisionBox.getY() + collisionBox.getHeight()) && door.getY() + door.getCollisionBox().height > collisionBox.getY()  + collisionBox.getHeight()) || (door.getY() < collisionBox.getCenterY() && door.getY() + door.getCollisionBox().getHeight() > collisionBox.getCenterY()))) {
                 return true;
             }
         }

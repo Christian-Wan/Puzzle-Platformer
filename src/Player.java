@@ -338,7 +338,7 @@ public class Player implements KeyListener{
 
     public boolean doorOnRight(ArrayList<Door> doors) {
         for (Door door: doors) {
-            if ((door.getCollisionBox().getX() <= collisionBox.getX() + collisionBox.getWidth()) && (door.getCollisionBox().getX() + door.getCollisionBox().getWidth() >= collisionBox.getX() + collisionBox.getWidth()) && ((door.getCollisionBox().getY() < collisionBox.getY() && door.getCollisionBox().getY() + door.getCollisionBox().getHeight() > collisionBox.getY()) || (door.getCollisionBox().getY() < collisionBox.getY() + collisionBox.getHeight() && door.getCollisionBox().getY() + door.getCollisionBox().getHeight() > collisionBox.getY() + collisionBox.getHeight()) || (door.getCollisionBox().getY() < collisionBox.getCenterY() && door.getCollisionBox().getY() + door.getCollisionBox().getHeight() > collisionBox.getCenterY()))) {
+            if ((door.getCollisionBox().getX() - 2 <= collisionBox.getX() + collisionBox.getWidth()) && (door.getCollisionBox().getX() - 2 + door.getCollisionBox().getWidth() >= collisionBox.getX() + collisionBox.getWidth()) && ((door.getCollisionBox().getY() < collisionBox.getY() && door.getCollisionBox().getY() + door.getCollisionBox().getHeight() > collisionBox.getY()) || (door.getCollisionBox().getY() < collisionBox.getY() + collisionBox.getHeight() && door.getCollisionBox().getY() + door.getCollisionBox().getHeight() > collisionBox.getY() + collisionBox.getHeight()) || (door.getCollisionBox().getY() < collisionBox.getCenterY() && door.getCollisionBox().getY() + door.getCollisionBox().getHeight() > collisionBox.getCenterY()))) {
                 return true;
             }
         }
@@ -378,7 +378,7 @@ public class Player implements KeyListener{
 
     public boolean boxOnRight(ArrayList<Box> boxes) {
         for (Box box: boxes) {
-            if ((box.getX() <= collisionBox.getX() + collisionBox.getWidth()) && (box.getX() + 32 >= collisionBox.getX() + collisionBox.getWidth()) && ((box.getY() < collisionBox.getY() && box.getY() + 32 > collisionBox.getY()) || (box.getY() < collisionBox.getY() + collisionBox.getHeight() && box.getY() + 32 > collisionBox.getY() + collisionBox.getHeight()) || (box.getY() <= collisionBox.getCenterY() && box.getY() + 32 >= collisionBox.getCenterY()))) {
+            if ((box.getX() - 2 <= collisionBox.getX() + collisionBox.getWidth()) && (box.getX() + 30 >= collisionBox.getX() + collisionBox.getWidth()) && ((box.getY() < collisionBox.getY() && box.getY() + 32 > collisionBox.getY()) || (box.getY() < collisionBox.getY() + collisionBox.getHeight() && box.getY() + 32 > collisionBox.getY() + collisionBox.getHeight()) || (box.getY() <= collisionBox.getCenterY() && box.getY() + 32 >= collisionBox.getCenterY()))) {
                 return true;
             }
         }
@@ -424,8 +424,8 @@ public class Player implements KeyListener{
     public boolean playerOnRight(ArrayList<Player> players) {
         for (Player player: players) {
             if (player.isAvailable()) {
-                if (player != this && (player.getCollisionBox().getX() <= collisionBox.getX() + collisionBox.getWidth()) &&
-                        (player.getCollisionBox().getX() + player.getCollisionBox().getWidth() >= collisionBox.getX() + collisionBox.getWidth()) &&
+                if (player != this && (player.getCollisionBox().getX() - 2 <= collisionBox.getX() + collisionBox.getWidth()) &&
+                        (player.getCollisionBox().getX() - 2 + player.getCollisionBox().getWidth() >= collisionBox.getX() + collisionBox.getWidth()) &&
                         ((player.getCollisionBox().getY() < collisionBox.getY() && player.getCollisionBox().getY() + player.getCollisionBox().getHeight() > collisionBox.getY()) ||
                                 (player.getCollisionBox().getY() < collisionBox.getY() + collisionBox.getHeight() && player.getCollisionBox().getY() + player.getCollisionBox().getHeight() > collisionBox.getY() + collisionBox.getHeight()) ||
                                 (player.getCollisionBox().getY() <= collisionBox.getCenterY() && player.getCollisionBox().getY() + player.getCollisionBox().getHeight() >= collisionBox.getCenterY()))) {
@@ -462,7 +462,7 @@ public class Player implements KeyListener{
     }
 
     public boolean skeletonOnRight(Skeleton skeleton) {
-        if ((skeleton.getCollisionBox().getX() <= collisionBox.getX() + collisionBox.getWidth()) &&
+        if ((skeleton.getCollisionBox().getX() - 2 <= collisionBox.getX() - 2 + collisionBox.getWidth()) &&
                 (skeleton.getCollisionBox().getX() + skeleton.getCollisionBox().getWidth() >= collisionBox.getX() + collisionBox.getWidth()) &&
                 ((skeleton.getCollisionBox().getY() < collisionBox.getY() && skeleton.getCollisionBox().getY() + skeleton.getCollisionBox().getHeight() > collisionBox.getY()) ||
                         (skeleton.getCollisionBox().getY() < collisionBox.getY() + collisionBox.getHeight() && skeleton.getCollisionBox().getY() + skeleton.getCollisionBox().getHeight() > collisionBox.getY() + collisionBox.getHeight()) ||
@@ -474,9 +474,9 @@ public class Player implements KeyListener{
     }
 
 
-    public void touchingSpike(ArrayList<Spike> spikes) {
-        for (Spike spike: spikes) {
-            if (spike.getCollisionBox().intersects(collisionBox)) {
+    public void touchingSpike(ArrayList<Rectangle> spikes) {
+        for (Rectangle spike: spikes) {
+            if (spike.intersects(collisionBox)) {
                 available = false;
                 engine.getLevelLayout().resetStage();
                 break;

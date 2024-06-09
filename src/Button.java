@@ -15,20 +15,22 @@ public class Button extends Opener {
     public Button(Engine engine, String buttonNumber, int x, int y) {
         super(engine, buttonNumber);
         super.setCollisionBox(new Rectangle(x, y, 16, 8));
-        switch(super.getNumber()) {
-            case 1:
-                try {
+        try {
+            switch (super.getNumber()) {
+                case 1:
                     up = ImageIO.read(new File("image/Level_Assets/Button_Red.png")).getSubimage(28, 45, 8, 3);
                     down = ImageIO.read(new File("image/Level_Assets/Button_Red_Down.png")).getSubimage(28, 45, 8, 3);
-                } catch (IOException e) {}
-                break;
-            case 2:
-                try {
+                    break;
+                case 2:
                     up = ImageIO.read(new File("image/Level_Assets/Button_Blue.png")).getSubimage(28, 45, 8, 3);
                     down = ImageIO.read(new File("image/Level_Assets/Button_Blue_Down.png")).getSubimage(28, 45, 8, 3);
-                } catch (IOException e) {}
-                break;
-        }
+                    break;
+                case 3:
+                    up = ImageIO.read(new File("image/Level_Assets/Button_Green.png")).getSubimage(28, 45, 8, 3);
+                    down = ImageIO.read(new File("image/Level_Assets/Button_Green_Down.png")).getSubimage(28, 45, 8, 3);
+                    break;
+            }
+        } catch (IOException e) {}
     }
     public boolean touchingBox(ArrayList<Box> boxes) {
         for (Box box: boxes) {

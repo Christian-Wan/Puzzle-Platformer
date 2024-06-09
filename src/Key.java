@@ -17,18 +17,19 @@ public class Key extends Opener {
         timer = 0;
         super.setCollisionBox(new Rectangle(x, y, 28, 12));
         //if there are multiple keys they have to be different colours so that the player knows which doors they open
-        switch(super.getNumber()) {
-            case 1:
-                try {
+        try {
+            switch (super.getNumber()) {
+                case 1:
                     image = ImageIO.read(new File("image/Level_Assets/Key_Red.png")).getSubimage(26, 29, 14, 6);
-                } catch (IOException e) {}
-                break;
-            case 2:
-                try {
+                    break;
+                case 2:
                     image = ImageIO.read(new File("image/Level_Assets/Key_Blue.png")).getSubimage(26, 29, 14, 6);
-                } catch (IOException e) {}
-                break;
-        }
+                    break;
+                case 3:
+                    image = ImageIO.read(new File("image/Level_Assets/Key_Green.png")).getSubimage(26, 29, 14, 6);
+                    break;
+            }
+        } catch (IOException e) {}
     }
 
     public void update() {

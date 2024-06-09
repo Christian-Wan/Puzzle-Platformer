@@ -1,7 +1,10 @@
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyListener;
+import java.io.IOException;
 
 
 public class Frame extends JFrame implements Runnable{
@@ -9,7 +12,7 @@ public class Frame extends JFrame implements Runnable{
     private Engine engine;
     private Thread windowThread;
     private String activePanel;
-    public Frame() {
+    public Frame() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
         engine = new Engine(this);
         engine.makePanels();
         activePanel = "Main Menu";
@@ -75,6 +78,8 @@ public class Frame extends JFrame implements Runnable{
         double nextDrawTime = System.nanoTime() + drawInterval;
 
         while (true) {
+            engine.getSoundControl().update();
+
             if (activePanel.equals("Play")) {
                 engine.getPlayPanel().update();
                 engine.getPlayPanel().repaint();

@@ -16,7 +16,7 @@ public class LevelSelectionPanel extends JPanel implements MouseListener {
     private Rectangle backButton;
     private Rectangle[][] levels;
     private Frame frame;
-    private BufferedImage image, star;
+    private BufferedImage image, star, backButtonImage;
     private Engine engine;
     private ArrayList<String> compleatedLevels;
     private ArrayList<Integer> compleatedLevelsDuringSession;
@@ -24,13 +24,14 @@ public class LevelSelectionPanel extends JPanel implements MouseListener {
         addMouseListener(this);
         setFocusable(true);
         engine = frame.getEngine();
-        backButton = new Rectangle(50, 50, 50, 50);
+        backButton = new Rectangle(-15, -15, 96, 96);
         createLevels();
         this.frame = frame;
         compleatedLevelsDuringSession = new ArrayList<Integer>();
         try {
             image = ImageIO.read(new File("image/Level_Selection.png"));
             star = ImageIO.read(new File("image/Star.png")).getSubimage(24, 22, 16, 16);
+            backButtonImage = ImageIO.read(new File("image/Back_Button.png"));
         } catch (IOException e) {}
         Scanner s = null;
         try {
@@ -74,7 +75,7 @@ public class LevelSelectionPanel extends JPanel implements MouseListener {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
         g2.drawImage(image, 0, 0, 1500, 900, null);
-        g2.drawRect((int) backButton.getX(), (int) backButton.getY(), (int) backButton.getWidth(), (int) backButton.getHeight());
+        g2.drawImage(backButtonImage, (int) backButton.getX(), (int) backButton.getY(), (int) backButton.getWidth(), (int) backButton.getHeight(), null);
         int levelNumber = 0;
         for (Rectangle[] row: levels) {
             for (Rectangle level: row) {
@@ -104,13 +105,13 @@ public class LevelSelectionPanel extends JPanel implements MouseListener {
                 engine.getTransitions().setIn(true);
             }
 
-            for (int r = 0; r < 4; r++) {
-                for (int c = 0; c < 5; c ++) {
+            for (int r = 0; r < 5; r++) {
+                for (int c = 0; c < 8; c ++) {
 
                     if (levels[r][c] != null) {
                         if (levels[r][c].contains(clicked)) {
                             //Row * 5  + Column + 1
-                            engine.newLevelLayout(r * 5 + c + 1);
+                            engine.newLevelLayout(r * 8 + c + 1);
                             engine.getTransitions().setDesiredLocation("Play");
                             engine.getTransitions().setIn(true);
                         }

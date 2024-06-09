@@ -1,3 +1,7 @@
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import java.io.IOException;
+
 public class Engine {
     private Player player;
     private Wizard wizard;
@@ -11,16 +15,17 @@ public class Engine {
     private MainMenuPanel mainMenuPanel;
     private LevelSelectionPanel levelSelectionPanel;
     private Transitions transitions;
+    private SoundControl soundControl;
     final private int SCALE = 2;
 
-    public Engine(Frame frame) {
+    public Engine(Frame frame) throws UnsupportedAudioFileException, LineUnavailableException, IOException {
         transitions = new Transitions(this);
         this.frame = frame;
         this.playBackground = new PlayBackground();
         this.player = new Player(this);
         this.portal = new Portal(this);
         this.levelLayout = new LevelLayout(this);
-
+        soundControl = new SoundControl();
     }
 
     public void makePanels() {
@@ -104,4 +109,9 @@ public class Engine {
     public Knight getKnight() {
         return knight;
     }
+
+    public SoundControl getSoundControl() {
+        return soundControl;
+    }
+
 }

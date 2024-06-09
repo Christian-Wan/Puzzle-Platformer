@@ -30,8 +30,11 @@ public class Door {
             if (number == 1) {
                 door = ImageIO.read(new File("image/Level_Assets/Walls_Tileset.png")).getSubimage(160, 112, 32, 32);
             }
-            else {
+            else if (number == 2){
                 door = ImageIO.read(new File("image/Level_Assets/Walls_Tileset.png")).getSubimage(208, 112, 32, 32);
+            }
+            else {
+                door = ImageIO.read(new File("image/Level_Assets/Walls_Tileset.png")).getSubimage(544, 112, 32, 32);
             }
         } catch (IOException e) {}
     }
@@ -158,9 +161,6 @@ public class Door {
         }
         g.drawImage(door, collisionBox.x, collisionBox.y, 32, 32, null);
         g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
-        g.setColor(Color.GREEN);
-        g.drawRect(collisionBox.x, collisionBox.y, collisionBox.width, collisionBox.height);
-
     }
 
     public int getX() {

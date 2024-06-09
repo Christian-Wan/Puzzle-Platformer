@@ -95,7 +95,7 @@ public class Skeleton extends Player {
         return false;
     }
     //makes it so that skeleton is affected by spikes
-    public void touchingSpike(ArrayList<Spike> Spikes) {}
+    public void touchingSpike(ArrayList<Rectangle> Spikes) {}
     //makes it so that skeleton can't receive key inputs
     public void keyPressed(KeyEvent e) {
 

@@ -15,7 +15,7 @@ import java.util.logging.Level;
 
 public class LevelLayout {
 
-    private BufferedImage topLeftCorner, topRightCorner, bottomLeftCorner, bottomRightCorner, upWall, leftWall, rightWall, downWall, darkness, topLeftDarkness, topRightDarkness, bottomLeftDarkness, bottomRightDarkness, spike, arrow, oneWayLeft, oneWayMiddle, oneWayRight;
+    private BufferedImage topLeftCorner, topRightCorner, bottomLeftCorner, bottomRightCorner, upWall, leftWall, rightWall, downWall, darkness, topLeftDarkness, topRightDarkness, bottomLeftDarkness, bottomRightDarkness, spike, arrow, oneWayLeft, oneWayMiddle, oneWayRight, halfCornerDown, halfCornerRight, halfCornerUp, halfCornerLeft, halfCornerHalfWallDown, halfCornerHalfWallRight, halfCornerHalfWallUp, halfCornerHalfWallLeft, allCorner, allWall, doubleMiddleUpDown, doubleMiddleRightLeft, doubleRight, doubleLeft, doubleDown, doubleUp;
     private BufferedImage combined;
     private ArrayList<Rectangle> walls, oneWayPlatforms;
     private String[][] levelData;
@@ -28,7 +28,7 @@ public class LevelLayout {
     private HashMap<Opener, Door[]> openersAndDoors;
     private ArrayList<Opener> openers;
     private ArrayList<Door> doors;
-    private ArrayList<Spike> spikes;
+    private ArrayList<Rectangle> spikes;
 
     //Have like a list of all the characters that the player can control and when a character reaches the portal remove them from the list
 
@@ -46,7 +46,7 @@ public class LevelLayout {
         openersAndDoors = new HashMap<Opener, Door[]>();
         openers = new ArrayList<Opener>();
         doors = new ArrayList<Door>();
-        spikes = new ArrayList<Spike>();
+        spikes = new ArrayList<Rectangle>();
         oneWayPlatforms = new ArrayList<Rectangle>();
         combined = new BufferedImage(1500, 900, BufferedImage.TYPE_INT_ARGB);
         setTileSet();
@@ -78,6 +78,22 @@ public class LevelLayout {
         oneWayLeft = tileset.getSubimage(496, 16, 32, 6);
         oneWayMiddle = tileset.getSubimage(496, 48, 32, 6);
         oneWayRight = tileset.getSubimage(496, 80, 32, 6);
+        halfCornerDown = tileset.getSubimage(256, 16, 32, 32);
+        halfCornerRight = tileset.getSubimage(256, 64, 32, 32);
+        halfCornerUp = tileset.getSubimage(304, 64, 32, 32);
+        halfCornerLeft = tileset.getSubimage(304, 16, 32, 32);
+        halfCornerHalfWallDown = tileset.getSubimage(352, 16, 32, 32);
+        halfCornerHalfWallRight = tileset.getSubimage(352, 64, 32, 32);
+        halfCornerHalfWallUp = tileset.getSubimage(400, 64, 32, 32);
+        halfCornerHalfWallLeft = tileset.getSubimage(400, 16, 32, 32);
+        allCorner = tileset.getSubimage(448, 16, 32, 32);
+        allWall = tileset.getSubimage(448, 64, 32, 32);
+        doubleMiddleUpDown = tileset.getSubimage(256, 112, 32, 32);
+        doubleMiddleRightLeft = tileset.getSubimage(304, 112, 32, 32);
+        doubleRight = tileset.getSubimage(352, 112, 32, 32);
+        doubleLeft = tileset.getSubimage(400, 112, 32, 32);
+        doubleDown = tileset.getSubimage(448, 112, 32, 32);
+        doubleUp = tileset.getSubimage(496, 112, 32, 32);
         try {
             spike = ImageIO.read(new File("image/Level_Assets/Spike.png")).getSubimage(16, 41,32, 7);
             arrow = ImageIO.read(new File("image/Level_Assets/Arrow.png")).getSubimage(25, 19,14, 23);
@@ -135,6 +151,54 @@ public class LevelLayout {
                     case "s":
                         g.drawImage(bottomRightDarkness, c * 32, r * 32, 32, 32, null);
                         break;
+                    case "Q":
+                        g.drawImage(halfCornerDown, c * 32, r * 32, 32, 32, null);
+                        break;
+                    case "W":
+                        g.drawImage(halfCornerRight, c * 32, r * 32, 32, 32, null);
+                        break;
+                    case "E":
+                        g.drawImage(halfCornerUp, c * 32, r * 32, 32, 32, null);
+                        break;
+                    case "R":
+                        g.drawImage(halfCornerLeft, c * 32, r * 32, 32, 32, null);
+                        break;
+                    case "T":
+                        g.drawImage(halfCornerHalfWallDown, c * 32, r * 32, 32, 32, null);
+                        break;
+                    case "Y":
+                        g.drawImage(halfCornerHalfWallRight, c * 32, r * 32, 32, 32, null);
+                        break;
+                    case "U":
+                        g.drawImage(halfCornerHalfWallUp, c * 32, r * 32, 32, 32, null);
+                        break;
+                    case "I":
+                        g.drawImage(halfCornerHalfWallLeft, c * 32, r * 32, 32, 32, null);
+                        break;
+                    case "O":
+                        g.drawImage(allCorner, c * 32, r * 32, 32, 32, null);
+                        break;
+                    case "P":
+                        g.drawImage(allWall, c * 32, r * 32, 32, 32, null);
+                        break;
+                    case "A":
+                        g.drawImage(doubleMiddleUpDown, c * 32, r * 32, 32, 32, null);
+                        break;
+                    case "S":
+                        g.drawImage(doubleMiddleRightLeft, c * 32, r * 32, 32, 32, null);
+                        break;
+                    case "D":
+                        g.drawImage(doubleRight, c * 32, r * 32, 32, 32, null);
+                        break;
+                    case "F":
+                        g.drawImage(doubleLeft, c * 32, r * 32, 32, 32, null);
+                        break;
+                    case "G":
+                        g.drawImage(doubleDown, c * 32, r * 32, 32, 32, null);
+                        break;
+                    case "H":
+                        g.drawImage(doubleUp, c * 32, r * 32, 32, 32, null);
+                        break;
                     case "p":
                         engine.newWizard(c * 32 + 2, r * 32 + 20);
                         availableCharacters.add(engine.getWizard());
@@ -156,7 +220,7 @@ public class LevelLayout {
                         availableCharacters.add(engine.getNecromancer());
                         break;
                     case "^":
-                        spikes.add(new Spike (c * 32, r * 32 + 28));
+                        spikes.add(new Rectangle(c * 32, r * 32 + 16, 32, 5));
                         g.drawImage(spike, c * 32, r * 32 + 25, 32 ,7, null);
                         break;
                     case "<":
@@ -284,10 +348,6 @@ public class LevelLayout {
         engine.getPlayBackground().draw(g);
         arrowCounter++;
         g.drawImage(combined, 0, 0, null);
-        g.setColor(Color.BLUE);
-        for (int i = 0; i < walls.size(); i++) {
-            g.drawRect((int) walls.get(i).getX(), (int) walls.get(i).getY(), (int) walls.get(i).getWidth(), (int) walls.get(i).getHeight());
-        }
         //Draws all boxes
         for (Box box: boxes) {
             box.draw(g);
@@ -380,7 +440,7 @@ public class LevelLayout {
         return doors;
     }
 
-    public ArrayList<Spike> getSpikes() {
+    public ArrayList<Rectangle> getSpikes() {
         return spikes;
     }
 

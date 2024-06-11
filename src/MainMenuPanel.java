@@ -55,12 +55,7 @@ public class MainMenuPanel extends JPanel implements MouseListener {
         }
         BufferedImage image = menu.getSubimage(frameNumber * 1500, 0, 1500, 900);
         g.drawImage(image, 0, 0, 1500, 900, null);
-        if (!settingsOpen) {
-            g.setColor(Color.PINK);
-            g.drawRect((int) playButton.getX(), (int) playButton.getY(), (int) playButton.getWidth(), (int) playButton.getHeight());
-            g.drawRect((int) settingsButton.getX(), (int) settingsButton.getY(), (int) settingsButton.getWidth(), (int) settingsButton.getHeight());
-        }
-        else {
+        if (settingsOpen) {
             engine.getSoundControl().draw(g2);
         }
         engine.getTransitions().draw(g2);
